@@ -12,6 +12,7 @@
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.468.0",
     "promise": "^8.3.0",
+    "promise-retry": "^2.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
