@@ -1,5 +1,7 @@
 {
-  "server": {
-    "port": 3000
+  "build": {
+    "command": "npm ci --prefer-offline && npm run build",
+    "development": "npm run dev",
+    "framework": "vite"
   }
 }
