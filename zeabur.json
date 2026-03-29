@@ -1,10 +1,5 @@
 {
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": "."
-  },
   "server": {
-    "port": 3000,
-    "healthCheck": "/"
+    "port": 3000
   }
 }
