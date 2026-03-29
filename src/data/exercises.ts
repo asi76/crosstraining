@@ -1,20 +1,4 @@
-export interface Exercise {
-  id: string;
-  name: string;
-  muscleGroup: MuscleGroup;
-  muscles: string[];
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  reps?: number;
-  duration?: number;
-}
-
-export type MuscleGroup = 
-  | 'upper-push' 
-  | 'upper-pull' 
-  | 'lower-body' 
-  | 'core' 
-  | 'plyometric' 
-  | 'cardio';
+import { Exercise, MuscleGroup } from './types';
 
 export const muscleGroupLabels: Record<MuscleGroup, string> = {
   'upper-push': 'Upper Body Push',
@@ -23,6 +7,15 @@ export const muscleGroupLabels: Record<MuscleGroup, string> = {
   'core': 'Core',
   'plyometric': 'Plyometric',
   'cardio': 'Cardio/HIIT',
+};
+
+export const muscleGroupColors: Record<MuscleGroup, string> = {
+  'upper-push': 'text-red-400 bg-red-400/10 border-red-400/20',
+  'upper-pull': 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+  'lower-body': 'text-green-400 bg-green-400/10 border-green-400/20',
+  'core': 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
+  'plyometric': 'text-orange-400 bg-orange-400/10 border-orange-400/20',
+  'cardio': 'text-pink-400 bg-pink-400/10 border-pink-400/20',
 };
 
 export const exercises: Exercise[] = [
@@ -55,7 +48,7 @@ export const exercises: Exercise[] = [
   // Lower Body (legs, glutes)
   { id: 'lb1', name: 'Squats', muscleGroup: 'lower-body', muscles: ['Quads', 'Glutes', 'Hamstrings'], difficulty: 'beginner', reps: 15 },
   { id: 'lb2', name: 'Lunges', muscleGroup: 'lower-body', muscles: ['Quads', 'Glutes', 'Hamstrings'], difficulty: 'beginner', reps: 12 },
-  { id: 'lb3', name: 'Deadlifts (Romanian)', muscleGroup: 'lower-body', muscles: ['Hamstrings', 'Glutes', 'Lower Back'], difficulty: 'intermediate', reps: 12 },
+  { id: 'lb3', name: 'Romanian Deadlifts', muscleGroup: 'lower-body', muscles: ['Hamstrings', 'Glutes', 'Lower Back'], difficulty: 'intermediate', reps: 12 },
   { id: 'lb4', name: 'Leg Press', muscleGroup: 'lower-body', muscles: ['Quads', 'Glutes'], difficulty: 'beginner', reps: 12 },
   { id: 'lb5', name: 'Bulgarian Split Squats', muscleGroup: 'lower-body', muscles: ['Quads', 'Glutes'], difficulty: 'intermediate', reps: 10 },
   { id: 'lb6', name: 'Hip Thrusts', muscleGroup: 'lower-body', muscles: ['Glutes', 'Hamstrings'], difficulty: 'intermediate', reps: 15 },
@@ -109,11 +102,6 @@ export const getExercisesByMuscleGroup = (group: MuscleGroup): Exercise[] => {
   return exercises.filter(e => e.muscleGroup === group);
 };
 
-export const defaultStations = [
-  { id: 'station-1', muscleGroup: 'upper-push' as MuscleGroup },
-  { id: 'station-2', muscleGroup: 'upper-pull' as MuscleGroup },
-  { id: 'station-3', muscleGroup: 'lower-body' as MuscleGroup },
-  { id: 'station-4', muscleGroup: 'core' as MuscleGroup },
-  { id: 'station-5', muscleGroup: 'plyometric' as MuscleGroup },
-  { id: 'station-6', muscleGroup: 'cardio' as MuscleGroup },
-];
+export const getExerciseById = (id: string): Exercise | undefined => {
+  return exercises.find(e => e.id === id);
+};

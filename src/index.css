@@ -1,3 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-color: #0f0f0f;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* Dark scrollbar for groups and all overflow areas */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #27272a;
+}
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Modal edit form - smaller elements */
+.modal-edit-form input,
+.modal-edit-form select,
+.modal-edit-form textarea {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+.modal-edit-form label {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Modal scrollbar - dark like card */
+.modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-scroll::-webkit-scrollbar-track {
+  background: #27272a;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+.modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}

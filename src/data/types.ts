@@ -1,39 +1,62 @@
-import { Exercise, MuscleGroup } from './exercises';
+export type MuscleGroup =
+  | 'upper-push'
+  | 'upper-pull'
+  | 'lower-body'
+  | 'core'
+  | 'plyometric'
+  | 'cardio';
 
-export interface StationExercise extends Exercise {
+export interface Exercise {
+  id: string;
+  name: string;
+  muscleGroup: MuscleGroup;
+  muscles: string[];
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  tipo?: 'aerobico' | 'anaerobico';
   reps?: number;
   duration?: number;
+  description?: string;
+}
+
+export interface WorkoutExercise {
+  exerciseId: string;
+  sets: number;
+  reps: number;
+  rest?: number;
 }
 
 export interface Station {
   id: string;
-  muscleGroup: MuscleGroup;
-  exercise?: StationExercise;
+  name: string;
+  exercises: WorkoutExercise[];
 }
 
 export interface Workout {
   id: string;
   name: string;
   stations: Station[];
-  restBetweenStations: number;
-  rounds: number;
-  restBetweenRounds: number;
   createdAt: string;
+  savedAt?: string;
 }
+
+export const STATIONS = [
+  'Station 1: Upper Body Push',
+  'Station 2: Upper Body Pull',
+  'Station 3: Lower Body Squat',
+  'Station 4: Lower Body Hinge',
+  'Station 5: Core',
+  'Station 6: Cardio'
+] as const;
+
+export type StationName = typeof STATIONS[number];
 
 export const createDefaultWorkout = (): Workout => ({
   id: crypto.randomUUID(),
   name: 'My Workout',
-  stations: [
-    { id: 'station-1', muscleGroup: 'upper-push' },
-    { id: 'station-2', muscleGroup: 'upper-pull' },
-    { id: 'station-3', muscleGroup: 'lower-body' },
-    { id: 'station-4', muscleGroup: 'core' },
-    { id: 'station-5', muscleGroup: 'plyometric' },
-    { id: 'station-6', muscleGroup: 'cardio' },
-  ],
-  restBetweenStations: 30,
-  rounds: 3,
-  restBetweenRounds: 60,
+  stations: STATIONS.map((name, index) => ({
+    id: `station-${index}`,
+    name,
+    exercises: []
+  })),
   createdAt: new Date().toISOString(),
 });
