@@ -172,22 +172,24 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
   // Toggle group expansion
   const toggleGroup = (groupId: string) => {
-    const newExpanded = new Set(expandedGroups);
-    if (newExpanded.has(groupId)) {
-      newExpanded.delete(groupId);
-    } else {
-      newExpanded.add(groupId);
-      // Scroll the group header into view when expanding
-      setTimeout(() => {
-        const element = document.getElementById(`group-header-${groupId}`);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          const top = rect.top + window.scrollY - 80; // 80px offset for sticky header
-          window.scrollTo({ top, behavior: 'smooth' });
-        }
-      }, 50);
-    }
-    setExpandedGroups(newExpanded);
+    setExpandedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+        // Scroll the group header into view when expanding
+        setTimeout(() => {
+          const element = document.getElementById(`group-header-${groupId}`);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            const top = rect.top + window.scrollY - 80; // 80px offset for sticky header
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        }, 50);
+      }
+      return next;
+    });
   };
 
   // Delete exercise
@@ -758,9 +760,6 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
             {/* Expanded Content */}
             {expandedGroups.has(group.id) && (
               <div className="border-t border-zinc-800 max-h-80 overflow-y-auto scrollbar-dark">
-                <div className="px-5 py-2 bg-yellow-500/20 text-yellow-400 text-sm">
-                  DEBUG: expanded=VERO exercises count={getExercisesByGroup(group.id).length}
-                </div>
                 {(() => {
                   const allGroupExercises = getExercisesByGroup(group.id);
                   // When searching, filter to show only matching exercises
