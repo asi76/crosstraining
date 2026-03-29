@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, X, Trash2, ChevronDown, ChevronUp, ArrowLeft, Target, Image, Shield, RefreshCw, LogOut, GripVertical, Edit3, ArrowRightLeft } from 'lucide-react';
+import { Plus, X, Trash2, ChevronDown, ChevronUp, ArrowLeft, Target, Image, Shield, RefreshCw, LogOut, GripVertical, Edit3, ArrowRightLeft, Search } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -84,6 +84,11 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
   const [editingExerciseInModal, setEditingExerciseInModal] = useState(false);
   const [moveExerciseModal, setMoveExerciseModal] = useState<{ exerciseIndex: number; fromCategory: string } | null>(null);
   const [fullEditModalExercise, setFullEditModalExercise] = useState<Exercise | null>(null);
+
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<{groupId: string; exerciseIds: string[]}[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const currentCategory = workoutCategories.find(c => c.id === selectedCategoryId) || workoutCategories[0];
 
@@ -293,6 +298,45 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       }
       return next;
     });
+  };
+
+  // Search exercises
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      setExpandedGroups(new Set());
+      return;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    const results: {groupId: string; exerciseIds: string[]}[] = [];
+    
+    groups.forEach(group => {
+      const groupExercises = exercises.filter(e => e.group_id === group.id);
+      const matchingExercises = groupExercises.filter(ex => 
+        ex.name.toLowerCase().includes(query)
+      );
+      
+      if (matchingExercises.length > 0) {
+        results.push({
+          groupId: group.id,
+          exerciseIds: matchingExercises.map(ex => ex.id)
+        });
+      }
+    });
+    
+    setSearchResults(results);
+    setIsSearching(true);
+    setExpandedGroups(new Set(results.map(r => r.groupId)));
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setIsSearching(false);
+    setExpandedGroups(new Set());
   };
 
   // Add exercise to current category and collapse the group it belongs to
@@ -610,59 +654,83 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-white">Libreria Esercizi</h3>
         
-        <div className="space-y-3">
-          {groups.map(group => (
-            <div key={group.id} className="bg-zinc-900 rounded-xl border border-zinc-800">
-              {/* Group Header */}
-              <button
-                id={`workout-group-header-${group.id}`}
-                onClick={() => toggleGroup(group.id)}
-                className="w-full px-5 py-4 flex items-center justify-between hover:bg-zinc-800/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded text-sm font-semibold border ${group.color_class}`}>
-                    {group.label}
-                  </span>
-                  <span className="text-base text-zinc-400">
-                    {getExercisesByGroup(group.id).length} esercizi
-                  </span>
-                </div>
-                {expandedGroups.has(group.id) ? (
-                  <ChevronUp className="w-5 h-5 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-zinc-400" />
-                )}
-              </button>
-
-              {/* Exercises List - shown when expanded */}
-              {expandedGroups.has(group.id) && (
-                <div className="border-t border-zinc-800 max-h-96 overflow-y-auto scrollbar-dark">
-                  {getExercisesByGroup(group.id).length === 0 ? (
-                    <div className="px-5 py-8 text-center text-zinc-500">
-                      Nessun esercizio
-                    </div>
-                  ) : (
-                    getExercisesByGroup(group.id).map(exercise => (
-                      <div
-                        key={exercise.id}
-                        className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors"
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <button
-                              onClick={() => handleViewExercise(exercise)}
-                              className="text-left w-full"
-                            >
-                              <span className="text-white font-medium">{exercise.name}</span>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {exercise.muscles.map((muscle, idx) => (
-                                  <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
-                                ))}
-                              </div>
-                            </button>
-                          </div>
+        {/* Search Row */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Cerca esercizio..."
+              className="w-full px-4 py-2 pl-10 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          </div>
+          <button
+            onClick={handleSearch}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+          >
+            Cerca
+          </button>
+          {isSearching && (
+            <button
+              onClick={clearSearch}
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg font-medium transition-colors"
+            >
+              X
+            </button>
+          )}
+        </div>
+        
+        {/* Search Results Info */}
+        {isSearching && searchResults.length > 0 && (
+          <div className="text-sm text-zinc-400">
+            Trovati {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi
+          </div>
+        )}
+        {isSearching && searchResults.length === 0 && searchQuery.trim() && (
+          <div className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-8 text-center text-zinc-500">
+            Nessun esercizio trovato per "{searchQuery}"
+          </div>
+        )}
+        
+        {/* When searching - show flat list */}
+        {isSearching && searchResults.length > 0 && (
+          <div className="space-y-3">
+            {exercises
+              .filter(ex => {
+                const searchResult = searchResults.find(r => r.exerciseIds.includes(ex.id));
+                return searchResult !== undefined;
+              })
+              .map(exercise => {
+                const group = groups.find(g => g.id === exercise.group_id);
+                return (
+                  <div
+                    key={exercise.id}
+                    className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-4 hover:bg-zinc-800/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className={`px-2 py-0.5 rounded text-xs ${group?.color_class || 'bg-zinc-700 text-zinc-300'}`}>
+                            {group?.label || 'Sconosciuto'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mt-2">
                           <button
-                            onClick={() => handleAddExercise(exercise, group.id)}
+                            onClick={() => handleViewExercise(exercise)}
+                            className="text-left"
+                          >
+                            <span className="text-white font-medium">{exercise.name}</span>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {exercise.muscles.map((muscle, idx) => (
+                                <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
+                              ))}
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => handleAddExercise(exercise, exercise.group_id)}
                             className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors ml-2"
                             title="Aggiungi"
                           >
@@ -670,13 +738,83 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                           </button>
                         </div>
                       </div>
-                    ))
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
+        
+        {/* When NOT searching - show expandable groups */}
+        {!isSearching && (
+          <div className="space-y-3">
+            {groups.map(group => (
+              <div key={group.id} className="bg-zinc-900 rounded-xl border border-zinc-800">
+                {/* Group Header */}
+                <button
+                  id={`workout-group-header-${group.id}`}
+                  onClick={() => toggleGroup(group.id)}
+                  className="w-full px-5 py-4 flex items-center justify-between hover:bg-zinc-800/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`px-3 py-1 rounded text-sm font-semibold border ${group.color_class}`}>
+                      {group.label}
+                    </span>
+                    <span className="text-base text-zinc-400">
+                      {getExercisesByGroup(group.id).length} esercizi
+                    </span>
+                  </div>
+                  {expandedGroups.has(group.id) ? (
+                    <ChevronUp className="w-5 h-5 text-zinc-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-zinc-400" />
                   )}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                </button>
+
+                {/* Exercises List - shown when expanded */}
+                {expandedGroups.has(group.id) && (
+                  <div className="border-t border-zinc-800 max-h-96 overflow-y-auto scrollbar-dark">
+                    {getExercisesByGroup(group.id).length === 0 ? (
+                      <div className="px-5 py-8 text-center text-zinc-500">
+                        Nessun esercizio
+                      </div>
+                    ) : (
+                      getExercisesByGroup(group.id).map(exercise => (
+                        <div
+                          key={exercise.id}
+                          className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <button
+                                onClick={() => handleViewExercise(exercise)}
+                                className="text-left w-full"
+                              >
+                                <span className="text-white font-medium">{exercise.name}</span>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {exercise.muscles.map((muscle, idx) => (
+                                    <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
+                                  ))}
+                                </div>
+                              </button>
+                            </div>
+                            <button
+                              onClick={() => handleAddExercise(exercise, group.id)}
+                              className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors ml-2"
+                              title="Aggiungi"
+                            >
+                              <Plus className="w-5 h-5 text-white" />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       </div>
 

@@ -761,26 +761,12 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
             {expandedGroups.has(group.id) && (
               <div className="border-t border-zinc-800 max-h-80 overflow-y-auto scrollbar-dark">
                 {(() => {
-                  const allGroupExercises = getExercisesByGroup(group.id);
-                  // When searching, filter to show only matching exercises
-                  const searchResult = searchResults.find(r => r.groupId === group.id);
-                  const exercisesToShow = isSearching && searchResult
-                    ? allGroupExercises.filter(ex => searchResult.exerciseIds.includes(ex.id))
-                    : allGroupExercises;
-                  
-                  if (exercisesToShow.length === 0) {
-                    return (
-                      <div className="px-5 py-8 text-center text-zinc-500">
-                        {isSearching ? 'Nessun esercizio corrisponde alla ricerca' : 'Nessun esercizio in questo gruppo'}
-                      </div>
-                    );
+                  const exercisesList = getExercisesByGroup(group.id);
+                  if (exercisesList.length === 0) {
+                    return <div className="px-5 py-8 text-center text-zinc-500">Nessun esercizio</div>;
                   }
-                  
-                  return exercisesToShow.map(exercise => (
-                    <div
-                      key={exercise.id}
-                      className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors"
-                    >
+                  return exercisesList.map(exercise => (
+                    <div key={exercise.id} className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
@@ -841,8 +827,8 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                       </div>
                     </div>
                   ));
-                })}
-                {/* Add exercise button at bottom of group */}
+                })()}
+                {/* Add exercise button at bottom */}
                 <div className="px-5 py-3 border-t border-zinc-800/50">
                   <button
                     onClick={() => handleAddExercise(group.id)}
