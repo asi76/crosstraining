@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Plus, Trash2, ArrowRightLeft, X, ArrowLeft, Edit3, RefreshCw, LogOut, Download, Upload, Image } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, Trash2, ArrowRightLeft, X, ArrowLeft, Edit3, RefreshCw, LogOut, Download, Upload, Image, Search } from 'lucide-react';
 import { getGroups, getExercises, createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings } from '../firebase';
 import { getGifUrl } from '../data/gifMapping';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
@@ -62,6 +62,11 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   const [editGroupColor, setEditGroupColor] = useState('blue');
   const [exerciseGifs, setExerciseGifs] = useState<Record<string, boolean>>({});
   const [allExercisesForGifCount, setAllExercisesForGifCount] = useState<any[]>([]);
+  
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<{groupId: string; exerciseIds: string[]}[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Subscribe to GIF mappings - real-time updates without repeated reads
   useEffect(() => {
@@ -312,6 +317,45 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
     }
   };
 
+  // Search exercises
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      setExpandedGroups(new Set());
+      return;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    const results: {groupId: string; exerciseIds: string[]}[] = [];
+    
+    groups.forEach(group => {
+      const groupExercises = exercises.filter(e => e.group_id === group.id);
+      const matchingExercises = groupExercises.filter(ex => 
+        ex.name.toLowerCase().includes(query)
+      );
+      
+      if (matchingExercises.length > 0) {
+        results.push({
+          groupId: group.id,
+          exerciseIds: matchingExercises.map(ex => ex.id)
+        });
+      }
+    });
+    
+    setSearchResults(results);
+    setIsSearching(true);
+    setExpandedGroups(new Set(results.map(r => r.groupId)));
+  };
+
+  // Clear search
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSearchResults([]);
+    setIsSearching(false);
+    setExpandedGroups(new Set());
+  };
+
   // Add new group
   const addGroup = async () => {
     if (!newGroupName.trim()) return;
@@ -525,11 +569,121 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
             </button>
           </div>
         </div>
+        
+        {/* Search Row */}
+        <div className="flex items-center gap-2 mt-3">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Cerca esercizio..."
+              className="w-full px-4 py-2 pl-10 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          </div>
+          <button
+            onClick={handleSearch}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+          >
+            Cerca
+          </button>
+          {isSearching && (
+            <button
+              onClick={clearSearch}
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded-lg font-medium transition-colors"
+            >
+              X
+            </button>
+          )}
+        </div>
+        
+        {/* Search Results Info */}
+        {isSearching && searchResults.length > 0 && (
+          <div className="mt-2 text-sm text-zinc-400">
+            Trovati {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi in {searchResults.length} gruppi
+          </div>
+        )}
+        {isSearching && searchResults.length === 0 && searchQuery.trim() && (
+          <div className="mt-2 text-sm text-zinc-400">
+            Nessun esercizio trovato per "{searchQuery}"
+          </div>
+        )}
       </div>
 
-      {/* Groups List */}
-      <div className="space-y-3">
-        {groups.map(group => (
+      {/* Flat Search Results - shown when searching */}
+      {isSearching && searchQuery.trim() && (
+        <div className="space-y-3">
+          <div className="text-sm text-zinc-400">
+            Risultati per "{searchQuery}" ({searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi)
+          </div>
+          {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0) === 0 ? (
+            <div className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-8 text-center text-zinc-500">
+              Nessun esercizio trovato
+            </div>
+          ) : (
+            exercises
+              .filter(ex => {
+                const searchResult = searchResults.find(r => r.exerciseIds.includes(ex.id));
+                return searchResult !== undefined;
+              })
+              .map(exercise => {
+                const group = groups.find(g => g.id === exercise.group_id);
+                return (
+                  <div
+                    key={exercise.id}
+                    className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-4 hover:bg-zinc-800/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <button
+                            onClick={() => handleViewExercise(exercise)}
+                            className="text-base font-medium text-white hover:text-blue-400 cursor-pointer transition-colors text-left flex items-center gap-2"
+                          >
+                            {exercise.name}
+                            {exerciseGifs[exercise.id] && (
+                              <span className="text-green-400 text-xs font-medium flex items-center gap-0.5">
+                                <Image className="w-3 h-3" /> GIF
+                              </span>
+                            )}
+                          </button>
+                          <span className={`px-2 py-0.5 rounded text-xs ${
+                            group?.color_class || 'bg-zinc-700 text-zinc-300'
+                          }`}>
+                            {group?.label || 'Sconosciuto'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex flex-wrap gap-1">
+                            {exercise.muscles.map((muscle, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleAddToWorkout(exercise)}
+                              className="p-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors"
+                              title="Aggiungi alla scheda"
+                            >
+                              <Plus className="w-4 h-4 text-blue-400" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+          )}
+        </div>
+      )}
+
+      {/* Groups List - only shown when NOT searching */}
+      {!isSearching && (
+        <div className="space-y-3">
+          {groups.map(group => (
           <div key={group.id} className="bg-zinc-900 rounded-xl border border-zinc-800">
             {/* Group Header */}
             <button
@@ -542,7 +696,13 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                   {group.label}
                 </span>
                 <span className="text-base text-zinc-400">
-                  {getExercisesByGroup(group.id).length} esercizi
+                  {/* When searching, show filtered count */}
+                  {(() => {
+                    const searchResult = searchResults.find(r => r.groupId === group.id);
+                    const totalCount = getExercisesByGroup(group.id).length;
+                    const filteredCount = isSearching && searchResult ? searchResult.exerciseIds.length : totalCount;
+                    return `${filteredCount} esercizi${isSearching && filteredCount !== totalCount ? ` (${totalCount} totali)` : ''}`;
+                  })()}
                 </span>
                 {(() => {
                   const groupExercises = allExercisesForGifCount.filter(e => e.group_id === group.id);
@@ -598,12 +758,23 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
             {/* Expanded Content */}
             {expandedGroups.has(group.id) && (
               <div className="border-t border-zinc-800 max-h-80 overflow-y-auto scrollbar-dark">
-                {getExercisesByGroup(group.id).length === 0 ? (
-                  <div className="px-5 py-8 text-center text-zinc-500">
-                    Nessun esercizio in questo gruppo
-                  </div>
-                ) : (
-                  getExercisesByGroup(group.id).map(exercise => (
+                {(() => {
+                  const allGroupExercises = getExercisesByGroup(group.id);
+                  // When searching, filter to show only matching exercises
+                  const searchResult = searchResults.find(r => r.groupId === group.id);
+                  const exercisesToShow = isSearching && searchResult
+                    ? allGroupExercises.filter(ex => searchResult.exerciseIds.includes(ex.id))
+                    : allGroupExercises;
+                  
+                  if (exercisesToShow.length === 0) {
+                    return (
+                      <div className="px-5 py-8 text-center text-zinc-500">
+                        {isSearching ? 'Nessun esercizio corrisponde alla ricerca' : 'Nessun esercizio in questo gruppo'}
+                      </div>
+                    );
+                  }
+                  
+                  return exercisesToShow.map(exercise => (
                     <div
                       key={exercise.id}
                       className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors"
@@ -667,8 +838,8 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
+                  ));
+                })}
                 {/* Add exercise button at bottom of group */}
                 <div className="px-5 py-3 border-t border-zinc-800/50">
                   <button
@@ -683,7 +854,8 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
             )}
           </div>
         ))}
-      </div>
+        </div>
+      )}
 
       {/* Add Group Button */}
       {/* Exercise Modal */}
