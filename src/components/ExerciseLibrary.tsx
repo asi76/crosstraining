@@ -759,7 +759,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
             {expandedGroups.has(group.id) && (
               <div className="border-t border-zinc-800 max-h-80 overflow-y-auto scrollbar-dark">
                 <div className="px-5 py-2 bg-yellow-500/20 text-yellow-400 text-sm">
-                  DEBUG: expanded={expandedGroups.has(group.id)} exercises count={getExercisesByGroup(group.id).length}
+                  DEBUG: expanded=VERO exercises count={getExercisesByGroup(group.id).length}
                 </div>
                 {(() => {
                   const allGroupExercises = getExercisesByGroup(group.id);
