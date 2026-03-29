@@ -6,11 +6,24 @@ import { exercises, muscleGroupLabels, MuscleGroup } from '../data/exercises';
 const muscleGroups: MuscleGroup[] = ['upper-push', 'upper-pull', 'lower-body', 'core', 'plyometric', 'cardio'];
 
 export function ExerciseLibrary() {
-  const [selectedGroup, setSelectedGroup] = useState<MuscleGroup>('upper-push');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<MuscleGroup>('upper-push');
+  const [expandedCategories, setExpandedCategories] = useState<Set<MuscleGroup>>(new Set(['upper-push']));
   const [searchQuery, setSearchQuery] = useState('');
 
+  const toggleCategory = (category: MuscleGroup) => {
+    setExpandedCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
+
   const filteredExercises = exercises
-    .filter(e => e.muscleGroup === selectedGroup)
+    .filter(e => e.muscleGroup === selectedCategoryId)
     .filter(e => e.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const difficultyColors = {
@@ -33,75 +46,96 @@ export function ExerciseLibrary() {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Category Tabs */}
-        <div className="lg:w-64 flex-shrink-0">
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-2">
-            {muscleGroups.map((group) => (
+      {/* Category List with Expansion */}
+      <div className="space-y-3">
+        {muscleGroups.map((group) => {
+          const isExpanded = expandedCategories.has(group);
+          const isSelected = selectedCategoryId === group;
+          const groupExercises = exercises
+            .filter(e => e.muscleGroup === group)
+            .filter(e => e.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+          return (
+            <div key={group} className="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
+              {/* Category Header - click to expand/collapse */}
               <button
-                key={group}
-                onClick={() => setSelectedGroup(group)}
-                className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-between ${
-                  selectedGroup === group
-                    ? 'bg-emerald-500/20 text-emerald-400'
-                    : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+                onClick={() => toggleCategory(group)}
+                className={`w-full text-left px-4 py-4 flex items-center justify-between transition-colors ${
+                  isSelected ? 'bg-emerald-500/10' : 'hover:bg-zinc-800/50'
                 }`}
               >
-                <span>{muscleGroupLabels[group]}</span>
-                <span className="text-xs bg-zinc-800 px-2 py-0.5 rounded-full">
-                  {exercises.filter(e => e.muscleGroup === group).length}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Exercise List */}
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white mb-4">
-            {muscleGroupLabels[selectedGroup]} Exercises
-          </h3>
-          <div className="grid gap-3">
-            {filteredExercises.map((exercise, index) => (
-              <motion.div
-                key={exercise.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.03 }}
-                className="bg-zinc-900 rounded-xl border border-zinc-800 p-4"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-white text-lg">{exercise.name}</h4>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {exercise.muscles.map((muscle) => (
-                        <span
-                          key={muscle}
-                          className="text-xs bg-zinc-800 text-zinc-300 px-2 py-1 rounded"
-                        >
-                          {muscle}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className={`text-xs font-medium px-2 py-1 rounded ${difficultyColors[exercise.difficulty]}`}>
-                      {exercise.difficulty}
-                    </span>
-                    <span className="text-sm text-zinc-400">
-                      {exercise.reps ? `${exercise.reps} reps` : exercise.duration ? `${exercise.duration}s` : ''}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <ChevronRight className={`w-5 h-5 text-zinc-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                  <span className={`font-medium ${isSelected ? 'text-emerald-400' : 'text-white'}`}>
+                    {muscleGroupLabels[group]}
+                  </span>
+                  <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full">
+                    {groupExercises.length}
+                  </span>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-          {filteredExercises.length === 0 && (
-            <div className="text-center py-12 text-zinc-500">
-              No exercises found matching "{searchQuery}"
+                {isSelected && (
+                  <span className="text-xs text-emerald-400 bg-emerald-500/20 px-2 py-1 rounded">
+                    Active
+                  </span>
+                )}
+              </button>
+
+              {/* Expanded Content */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: 'auto' }}
+                    exit={{ height: 0 }}
+                    className="border-t border-zinc-800"
+                  >
+                    <div className="p-4 grid gap-3">
+                      {groupExercises.length > 0 ? (
+                        groupExercises.map((exercise, index) => (
+                          <motion.div
+                            key={exercise.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.03 }}
+                            className="bg-zinc-800/50 rounded-lg p-4"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-white">{exercise.name}</h4>
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {exercise.muscles.map((muscle) => (
+                                    <span
+                                      key={muscle}
+                                      className="text-xs bg-zinc-700 text-zinc-300 px-2 py-1 rounded"
+                                    >
+                                      {muscle}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-end gap-2">
+                                <span className={`text-xs font-medium px-2 py-1 rounded ${difficultyColors[exercise.difficulty]}`}>
+                                  {exercise.difficulty}
+                                </span>
+                                <span className="text-sm text-zinc-400">
+                                  {exercise.reps ? `${exercise.reps} reps` : exercise.duration ? `${exercise.duration}s` : ''}
+                                </span>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-zinc-500">
+                          No exercises found matching "{searchQuery}"
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-          )}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
