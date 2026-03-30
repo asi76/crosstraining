@@ -523,7 +523,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
   return (
     <div className="max-w-4xl mx-auto p-4">
       {/* Sticky Header - dark black */}
-      <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm -mx-4 px-4 pb-2 space-y-2">
+      <div className="sticky top-0 z-40 bg-zinc-950 backdrop-blur-sm -mx-4 px-4 pb-2 space-y-2">
         {/* Title row */}
         <div className="flex items-center justify-between pt-4">
           <div className="flex items-center gap-4">

@@ -218,7 +218,7 @@ function App() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Sticky Header - dark black */}
-      <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm">
+      <div className="sticky top-0 z-40 bg-zinc-950 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

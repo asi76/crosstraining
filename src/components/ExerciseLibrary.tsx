@@ -519,7 +519,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       {/* Sticky Header - dark black */}
-      <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm -mx-4 px-4 py-4">
+      <div className="sticky top-0 z-40 bg-zinc-950 backdrop-blur-sm -mx-4 px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
