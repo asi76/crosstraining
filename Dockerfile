@@ -21,5 +21,5 @@ RUN npm run build
 # Expose the PORT from environment (Zeabur sets this)
 EXPOSE ${PORT:-8080}
 
-# Start - serve the built dist folder on the PORT Zeabur provides
-CMD sh -c "serve -s dist -l $PORT"
+# Start - serve the built dist folder on the PORT Zeabur provides (single page app mode)
+CMD sh -c "serve -s dist -l $PORT -n"
