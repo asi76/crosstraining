@@ -9,8 +9,8 @@ RUN npm install -g serve
 # Copy package files for dependency install
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install dependencies (use install instead of ci for better compatibility)
+RUN npm install --omit=dev
 
 # Copy source
 COPY . .
