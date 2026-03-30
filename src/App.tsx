@@ -217,13 +217,13 @@ function App() {
   // Home view with inline expandable workout cards
   return (
     <div className="min-h-screen bg-dark-bg">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-40 bg-dark-bg/95 backdrop-blur-sm border-b border-dark-border">
+      {/* Sticky Header - background same as icon bg in editor */}
+      <div className="sticky top-0 z-40 bg-zinc-800/95 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-500/20 p-2 rounded-xl">
-                <Dumbbell className="w-6 h-6 text-blue-400" />
+              <div className="bg-zinc-700 p-2 rounded-xl">
+                <Dumbbell className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">Crosstraining</h1>
@@ -234,7 +234,7 @@ function App() {
               {role === 'admin' && (
                 <button
                   onClick={() => setCurrentView('admin')}
-                  className="p-2 bg-dark-card border border-dark-border rounded-lg text-gray-400 hover:text-white transition-colors"
+                  className="p-2 bg-zinc-700 rounded-lg text-gray-300 hover:text-white transition-colors"
                   title="Admin Panel"
                 >
                   <Shield className="w-5 h-5" />
@@ -245,21 +245,21 @@ function App() {
                   setExpandedWorkoutId(null);
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
-                className="p-2 bg-dark-card border border-dark-border rounded-lg text-gray-400 hover:text-white transition-colors"
+                className="p-2 bg-zinc-700 rounded-lg text-gray-300 hover:text-white transition-colors"
                 title="Comprimi tutto"
               >
                 <ChevronUp className="w-5 h-5" />
               </button>
               <button
-                onClick={() => window.location.reload()}
-                className="p-2 bg-dark-card border border-dark-border rounded-lg text-gray-400 hover:text-white transition-colors"
-                title="Refresh"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'instant' }) || window.location.reload()}
+                className="p-2 bg-zinc-700 rounded-lg text-gray-300 hover:text-white transition-colors"
+                title="Aggiorna Pagina"
               >
                 <RefreshCw className="w-5 h-5" />
               </button>
               <button
                 onClick={signOut}
-                className="p-2 bg-dark-card border border-dark-border rounded-lg text-gray-400 hover:text-white transition-colors"
+                className="p-2 bg-zinc-700 rounded-lg text-gray-300 hover:text-white transition-colors"
                 title="Sign Out"
               >
                 <LogOut className="w-5 h-5" />
@@ -278,7 +278,7 @@ function App() {
             onClick={() => setCurrentView('create')}
             className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-left group flex items-center gap-4"
           >
-            <div className="bg-white/20 w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+            <div className="bg-blue-500/30 w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
               <Plus className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -291,10 +291,10 @@ function App() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setCurrentView('library')}
-            className="bg-dark-card border border-dark-border rounded-2xl p-5 text-left group hover:border-blue-500/50 transition-colors flex items-center gap-4"
+            className="bg-zinc-900 rounded-2xl p-5 text-left group hover:bg-zinc-800 transition-colors flex items-center gap-4"
           >
-            <div className="bg-blue-500/20 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-blue-500/30 transition-colors">
-              <Library className="w-6 h-6 text-blue-400" />
+            <div className="bg-zinc-700 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-zinc-600 transition-colors">
+              <Library className="w-6 h-6 text-white" />
             </div>
             <div>
               <h3 className="text-white font-bold text-lg">Libreria Esercizi</h3>
