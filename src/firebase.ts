@@ -176,4 +176,4 @@ export const getGifUrl = (filename: string) => {
   return `https://storage.googleapis.com/studio-7990555522-7e3ef.firebasestorage.app/gifs/${filename}`;
 };
 
-export { app };
+
