@@ -5,9 +5,8 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY pnpm-lock.yaml ./
 
-# Install dependencies (use npm instead of pnpm for Zeabur compatibility)
+# Install dependencies
 RUN npm install
 
 # Copy source
