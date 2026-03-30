@@ -15,8 +15,11 @@ COPY . .
 # Build
 RUN npm run build
 
-# Expose port
+# Expose port (Zeabur expects 3000)
 EXPOSE 3000
 
-# Start (serve built frontend)
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "3000"]
+# Install serve globally and use it
+RUN npm install -g serve
+
+# Start - serve the built dist folder
+CMD ["serve", "-s", "dist", "-l", "3000"]
