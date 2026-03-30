@@ -26,7 +26,7 @@ export function SavedWorkouts() {
       </h2>
 
       {savedWorkouts.length === 0 ? (
-        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-12 text-center">
+        <div className="bg-zinc-900 rounded-xl p-12 text-center">
           <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
             <FolderOpen className="w-8 h-8 text-zinc-600" />
           </div>
@@ -41,7 +41,7 @@ export function SavedWorkouts() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-zinc-900 rounded-xl border border-zinc-800 p-5 hover:border-zinc-700 transition-colors"
+              className="bg-zinc-900 rounded-xl p-5 hover:border-zinc-700 transition-colors"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">

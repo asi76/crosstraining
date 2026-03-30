@@ -376,7 +376,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-        <div className="bg-zinc-900 rounded-2xl border border-zinc-700 w-full max-w-md overflow-hidden">
+        <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h2 className="text-lg font-bold text-white">Sposta esercizio</h2>
             <button
@@ -413,7 +413,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-        <div className="bg-zinc-900 rounded-2xl border border-zinc-700 w-full max-w-md overflow-hidden">
+        <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h2 className="text-lg font-bold text-white">Aggiungi Gruppo</h2>
             <button
@@ -432,7 +432,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
               placeholder="Nome del gruppo"
-              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 bg-zinc-800 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
               onKeyDown={(e) => e.key === 'Enter' && addGroup()}
             />
             <div>
@@ -469,7 +469,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-        <div className="bg-zinc-900 rounded-2xl border border-zinc-700 w-full max-w-md overflow-hidden">
+        <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h2 className="text-lg font-bold text-white">Modifica Gruppo</h2>
             <button
@@ -485,7 +485,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
               value={editGroupName}
               onChange={(e) => setEditGroupName(e.target.value)}
               placeholder="Nome del gruppo"
-              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-3 bg-zinc-800 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
               onKeyDown={(e) => e.key === 'Enter' && saveEditGroup()}
             />
             <div>
@@ -518,8 +518,8 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-40 bg-dark-bg/95 backdrop-blur-sm -mx-4 px-4 py-4 border-b border-dark-border">
+      {/* Sticky Header - same as landing page */}
+      <div className="sticky top-0 z-40 bg-zinc-800/95 backdrop-blur-sm -mx-4 px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -581,7 +581,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Cerca esercizio..."
-              className="w-full px-4 py-2 pl-10 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2 pl-10 bg-zinc-800 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           </div>
@@ -616,12 +616,12 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
       {/* Flat Search Results - shown when searching */}
       {isSearching && searchQuery.trim() && (
-        <div className="space-y-3">
+        <div className="mt-4 space-y-3">
           <div className="text-sm text-zinc-400">
             Risultati per "{searchQuery}" ({searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi)
           </div>
           {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0) === 0 ? (
-            <div className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-8 text-center text-zinc-500">
+            <div className="bg-zinc-900 rounded-xl px-5 py-8 text-center text-zinc-500">
               Nessun esercizio trovato
             </div>
           ) : (
@@ -635,7 +635,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                 return (
                   <div
                     key={exercise.id}
-                    className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-4 hover:bg-zinc-800/30 transition-colors"
+                    className="bg-zinc-900 rounded-xl px-5 py-4 hover:bg-zinc-800/30 transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -660,7 +660,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                         <div className="flex items-center justify-between mt-1">
                           <div className="flex flex-wrap gap-1">
                             {exercise.muscles.map((muscle, idx) => (
-                              <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
+                              <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
                             ))}
                           </div>
                           <div className="flex items-center gap-1">
@@ -684,9 +684,9 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
       {/* Groups List - only shown when NOT searching */}
       {!isSearching && (
-        <div className="space-y-3">
+        <div className="mt-4 space-y-3">
           {groups.map(group => (
-          <div key={group.id} className="bg-zinc-900 rounded-xl border border-zinc-800">
+          <div key={group.id} className="bg-zinc-900 rounded-xl">
             {/* Group Header */}
             <button
               id={`group-header-${group.id}`}
@@ -792,7 +792,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                           <div className="flex items-center justify-between mt-1">
                             <div className="flex flex-wrap gap-1">
                               {exercise.muscles.map((muscle, idx) => (
-                                <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
+                                <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
                               ))}
                             </div>
                             <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${

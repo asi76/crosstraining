@@ -522,8 +522,8 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      {/* Sticky Header - contains everything above tabs */}
-      <div className="sticky top-0 z-40 bg-dark-bg/95 backdrop-blur-sm -mx-4 px-4 pb-2 border-b border-dark-border space-y-2">
+      {/* Sticky Header - same as landing page */}
+      <div className="sticky top-0 z-40 bg-zinc-800/95 backdrop-blur-sm -mx-4 px-4 pb-2 space-y-2">
         {/* Title row */}
         <div className="flex items-center justify-between pt-4">
           <div className="flex items-center gap-4">
@@ -573,7 +573,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
             value={workoutName}
             onChange={(e) => setWorkoutName(e.target.value)}
             placeholder="Nome della scheda"
-            className="flex-1 px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+            className="flex-1 px-4 py-3 bg-zinc-900 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
           />
           <button
             onClick={handleSave}
@@ -663,7 +663,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Cerca esercizio..."
-              className="w-full px-4 py-2 pl-10 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+              className="w-full px-4 py-2 pl-10 bg-zinc-800 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           </div>
@@ -690,7 +690,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
           </div>
         )}
         {isSearching && searchResults.length === 0 && searchQuery.trim() && (
-          <div className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-8 text-center text-zinc-500">
+          <div className="bg-zinc-900 rounded-xl px-5 py-8 text-center text-zinc-500">
             Nessun esercizio trovato per "{searchQuery}"
           </div>
         )}
@@ -708,7 +708,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                 return (
                   <div
                     key={exercise.id}
-                    className="bg-zinc-900 rounded-xl border border-zinc-800 px-5 py-4 hover:bg-zinc-800/30 transition-colors"
+                    className="bg-zinc-900 rounded-xl px-5 py-4 hover:bg-zinc-800/30 transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -725,7 +725,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                             <span className="text-white font-medium">{exercise.name}</span>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {exercise.muscles.map((muscle, idx) => (
-                                <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
+                                <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
                               ))}
                             </div>
                           </button>
@@ -749,7 +749,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
         {!isSearching && (
           <div className="space-y-3">
             {groups.map(group => (
-              <div key={group.id} className="bg-zinc-900 rounded-xl border border-zinc-800">
+              <div key={group.id} className="bg-zinc-900 rounded-xl">
                 {/* Group Header */}
                 <button
                   id={`workout-group-header-${group.id}`}
@@ -773,7 +773,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
 
                 {/* Exercises List - shown when expanded */}
                 {expandedGroups.has(group.id) && (
-                  <div className="border-t border-zinc-800 max-h-96 overflow-y-auto scrollbar-dark">
+                  <div className="max-h-96 overflow-y-auto scrollbar-dark">
                     {getExercisesByGroup(group.id).length === 0 ? (
                       <div className="px-5 py-8 text-center text-zinc-500">
                         Nessun esercizio
@@ -782,7 +782,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                       getExercisesByGroup(group.id).map(exercise => (
                         <div
                           key={exercise.id}
-                          className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors"
+                          className="px-5 py-450 last:border-b-0 hover:bg-zinc-800/30 transition-colors"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -793,7 +793,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                                 <span className="text-white font-medium">{exercise.name}</span>
                                 <div className="flex flex-wrap gap-1 mt-1">
                                   {exercise.muscles.map((muscle, idx) => (
-                                    <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white border border-white/30">{muscle}</span>
+                                    <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
                                   ))}
                                 </div>
                               </button>
@@ -822,11 +822,11 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       {viewingExercise && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80" onClick={() => { setViewingExercise(null); setEditingExerciseInModal(false); }}>
           <div 
-            className="bg-zinc-900 rounded-2xl border border-zinc-700 w-full max-w-2xl max-h-[80vh] overflow-hidden"
+            className="bg-zinc-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
+            <div className="flex items-center justify-between px-5 py-3">
               <div className="flex items-center gap-3">
                 <Target className="w-5 h-5 text-blue-500" />
                 <h2 className="text-lg font-bold text-white">
@@ -882,7 +882,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                             }
                           }
                         }}
-                        className="w-full px-3 py-2 bg-zinc-800 text-white border border-zinc-600 rounded-lg focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-2 bg-zinc-800 text-white rounded-lg focus:outline-none focus:border-blue-500"
                       >
                         {groups.map(g => (
                           <option key={g.id} value={g.id}>{g.label}</option>
@@ -942,7 +942,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                       <h3 className="text-sm font-medium text-zinc-400 mb-2">Muscoli</h3>
                       <div className="flex flex-wrap gap-2">
                         {viewingExercise.muscles?.map((muscle, idx) => (
-                          <span key={idx} className="px-2 py-1 rounded text-sm bg-white/20 text-white border border-white/30">
+                          <span key={idx} className="px-2 py-1 rounded text-sm bg-white/20 text-white">
                             {muscle}
                           </span>
                         ))}
@@ -996,10 +996,10 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       {moveExerciseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80" onClick={() => setMoveExerciseModal(null)}>
           <div
-            className="bg-zinc-900 rounded-2xl border border-zinc-700 w-full max-w-md overflow-hidden"
+            className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+            <div className="flex items-center justify-between px-5 py-4">
               <div className="flex items-center gap-3">
                 <div className="bg-blue-500/20 p-2 rounded-lg">
                   <ArrowRightLeft className="w-5 h-5 text-blue-400" />
@@ -1087,7 +1087,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       {duplicateError && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80" onClick={() => setDuplicateError(null)}>
           <div
-            className="bg-zinc-900 rounded-2xl border border-red-500/50 w-full max-w-md overflow-hidden"
+            className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
@@ -1108,7 +1108,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
               <p className="text-zinc-300 mb-2">L'esercizio <span className="text-white font-medium">{duplicateError}</span> e' gia presente in una delle tre tabelle.</p>
               <p className="text-zinc-500 text-sm">Rimuovi prima l'esercizio esistente per aggiungerlo a questa tabella.</p>
             </div>
-            <div className="px-5 py-4 border-t border-zinc-800 flex justify-end">
+            <div className="px-5 py-4 flex justify-end">
               <button
                 onClick={() => setDuplicateError(null)}
                 className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-medium rounded-lg transition-colors"
