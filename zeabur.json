@@ -1,7 +1,18 @@
 {
   "build": {
-    "command": "npm ci --prefer-offline && npm run build",
+    "command": "npm ci",
     "development": "npm run dev",
-    "framework": "vite"
+    "framework": "node"
+  },
+  "env": {
+    "NODE_ENV": "production",
+    "GITHUB_TOKEN": {
+      "description": "GitHub Personal Access Token",
+      "required": false
+    },
+    "GITHUB_REPO": {
+      "description": "GitHub repository (default: asi76/crosstraining)",
+      "required": false
+    }
   }
 }
