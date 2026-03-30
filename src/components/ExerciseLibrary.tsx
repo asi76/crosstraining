@@ -178,12 +178,12 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
         next.delete(groupId);
       } else {
         next.add(groupId);
-        // Scroll the group header into view when expanding, stopping 10px below search field
+        // Scroll the group header into view when expanding, matching CreateWorkout behavior
         setTimeout(() => {
           const element = document.getElementById(`group-header-${groupId}`);
           if (element) {
             const rect = element.getBoundingClientRect();
-            const top = rect.top + window.scrollY - 120; // offset to stop 10px below search field
+            const top = rect.top + window.scrollY - 180; // 180px offset to clear sticky header with tabs
             window.scrollTo({ top, behavior: 'smooth' });
           }
         }, 50);
@@ -759,7 +759,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
             {/* Expanded Content */}
             {expandedGroups.has(group.id) && (
-              <div className="max-h-95 overflow-y-auto scrollbar-dark">
+              <div className="max-h-96 overflow-y-auto scrollbar-dark">
                 {(() => {
                   const exercisesList = getExercisesByGroup(group.id);
                   if (exercisesList.length === 0) {
