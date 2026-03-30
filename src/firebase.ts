@@ -8,7 +8,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { firebaseConfig } from './firebase/config';
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 export const db: Firestore = getFirestore(app);
 export const storage = getStorage(app);
 
