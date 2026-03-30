@@ -522,8 +522,8 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      {/* Sticky Header - same as landing page */}
-      <div className="sticky top-0 z-40 bg-zinc-800/95 backdrop-blur-sm -mx-4 px-4 pb-2 space-y-2">
+      {/* Sticky Header - dark black */}
+      <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm -mx-4 px-4 pb-2 space-y-2">
         {/* Title row */}
         <div className="flex items-center justify-between pt-4">
           <div className="flex items-center gap-4">
@@ -695,9 +695,9 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
           </div>
         )}
         
-        {/* When searching - show flat list */}
+        {/* When searching - show flat list - same style as ExerciseLibrary */}
         {isSearching && searchResults.length > 0 && (
-          <div className="space-y-3">
+          <div className="mt-4 space-y-3">
             {exercises
               .filter(ex => {
                 const searchResult = searchResults.find(r => r.exerciseIds.includes(ex.id));
@@ -713,31 +713,43 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <span className={`px-2 py-0.5 rounded text-xs ${group?.color_class || 'bg-zinc-700 text-zinc-300'}`}>
-                            {group?.label || 'Sconosciuto'}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between mt-2">
                           <button
                             onClick={() => handleViewExercise(exercise)}
-                            className="text-left"
+                            className="text-base font-medium text-white hover:text-blue-400 cursor-pointer transition-colors text-left flex items-center gap-2"
                           >
-                            <span className="text-white font-medium">{exercise.name}</span>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {exercise.muscles.map((muscle, idx) => (
-                                <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
-                              ))}
-                            </div>
+                            {exercise.name}
                           </button>
-                          <button
-                            onClick={() => handleAddExercise(exercise, exercise.group_id)}
-                            className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors ml-2"
-                            title="Aggiungi"
-                          >
-                            <Plus className="w-5 h-5 text-white" />
-                          </button>
+                          <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
+                            exercise.tipo === 'aerobico' 
+                              ? 'bg-blue-500/20 text-blue-400' 
+                              : 'bg-orange-500/20 text-orange-400'
+                          }`}>
+                            {exercise.tipo === 'aerobico' ? 'Aerobico' : 'Anaerobico'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mt-1">
+                          <div className="flex flex-wrap gap-1">
+                            {exercise.muscles.map((muscle, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
+                            ))}
+                          </div>
+                          <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
+                            exercise.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                            exercise.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {exercise.difficulty === 'beginner' ? 'Principiante' :
+                             exercise.difficulty === 'intermediate' ? 'Intermedio' : 'Avanzato'}
+                          </span>
                         </div>
                       </div>
+                      <button
+                        onClick={() => handleAddExercise(exercise, exercise.group_id)}
+                        className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors ml-2"
+                        title="Aggiungi"
+                      >
+                        <Plus className="w-5 h-5 text-white" />
+                      </button>
                     </div>
                   </div>
                 );
@@ -771,7 +783,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                   )}
                 </button>
 
-                {/* Exercises List - shown when expanded */}
+                {/* Exercises List - shown when expanded - same style as ExerciseLibrary */}
                 {expandedGroups.has(group.id) && (
                   <div className="max-h-96 overflow-y-auto scrollbar-dark">
                     {getExercisesByGroup(group.id).length === 0 ? (
@@ -782,21 +794,40 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                       getExercisesByGroup(group.id).map(exercise => (
                         <div
                           key={exercise.id}
-                          className="px-5 py-450 last:border-b-0 hover:bg-zinc-800/30 transition-colors"
+                          className="px-5 py-4 hover:bg-zinc-800/30 transition-colors"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <button
-                                onClick={() => handleViewExercise(exercise)}
-                                className="text-left w-full"
-                              >
-                                <span className="text-white font-medium">{exercise.name}</span>
-                                <div className="flex flex-wrap gap-1 mt-1">
+                              <div className="flex items-center justify-between">
+                                <button
+                                  onClick={() => handleViewExercise(exercise)}
+                                  className="text-base font-medium text-white hover:text-blue-400 cursor-pointer transition-colors text-left flex items-center gap-2"
+                                >
+                                  {exercise.name}
+                                </button>
+                                <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
+                                  exercise.tipo === 'aerobico' 
+                                    ? 'bg-blue-500/20 text-blue-400' 
+                                    : 'bg-orange-500/20 text-orange-400'
+                                }`}>
+                                  {exercise.tipo === 'aerobico' ? 'Aerobico' : 'Anaerobico'}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between mt-1">
+                                <div className="flex flex-wrap gap-1">
                                   {exercise.muscles.map((muscle, idx) => (
                                     <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
                                   ))}
                                 </div>
-                              </button>
+                                <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
+                                  exercise.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                                  exercise.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                                  'bg-red-500/20 text-red-400'
+                                }`}>
+                                  {exercise.difficulty === 'beginner' ? 'Principiante' :
+                                   exercise.difficulty === 'intermediate' ? 'Intermedio' : 'Avanzato'}
+                                </span>
+                              </div>
                             </div>
                             <button
                               onClick={() => handleAddExercise(exercise, group.id)}

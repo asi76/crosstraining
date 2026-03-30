@@ -178,12 +178,12 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
         next.delete(groupId);
       } else {
         next.add(groupId);
-        // Scroll the group header into view when expanding
+        // Scroll the group header into view when expanding, stopping 10px below search field
         setTimeout(() => {
           const element = document.getElementById(`group-header-${groupId}`);
           if (element) {
             const rect = element.getBoundingClientRect();
-            const top = rect.top + window.scrollY - 80; // 80px offset for sticky header
+            const top = rect.top + window.scrollY - 120; // offset to stop 10px below search field
             window.scrollTo({ top, behavior: 'smooth' });
           }
         }, 50);
@@ -518,8 +518,8 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
-      {/* Sticky Header - same as landing page */}
-      <div className="sticky top-0 z-40 bg-zinc-800/95 backdrop-blur-sm -mx-4 px-4 py-4">
+      {/* Sticky Header - dark black */}
+      <div className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm -mx-4 px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -759,7 +759,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
             {/* Expanded Content */}
             {expandedGroups.has(group.id) && (
-              <div className="border-t border-zinc-800 max-h-80 overflow-y-auto scrollbar-dark">
+              <div className="max-h-95 overflow-y-auto scrollbar-dark">
                 {(() => {
                   const exercisesList = getExercisesByGroup(group.id);
                   if (exercisesList.length === 0) {
