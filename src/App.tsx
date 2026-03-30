@@ -340,7 +340,12 @@ function App() {
                 {/* Workout Header - clickable to expand */}
                 <div 
                   className="flex items-center justify-between p-4 cursor-pointer"
-                  onClick={() => setExpandedWorkoutId(expandedWorkoutId === workout.id ? null : workout.id)}
+                  onClick={() => {
+                    if (expandedWorkoutId !== workout.id) {
+                      window.scrollTo({ top: 0, behavior: 'instant' });
+                    }
+                    setExpandedWorkoutId(expandedWorkoutId === workout.id ? null : workout.id);
+                  }}
                 >
                   <div className="flex items-center gap-3 flex-1">
                     {expandedWorkoutId === workout.id ? (
@@ -425,10 +430,9 @@ function App() {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="border-t border-dark-border"
                     >
                       {/* Category Tabs - same style as CreateWorkout */}
-                      <div className="flex gap-2 p-4 border-b border-dark-border">
+                      <div className="flex gap-2 p-4">
                         {WORKOUT_CATEGORIES.map((cat) => {
                           const exercises = getExercisesByCategory(workout, cat.id);
                           const isSelected = selectedCategoryId === cat.id;
