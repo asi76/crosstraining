@@ -331,10 +331,10 @@ function App() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className={`bg-dark-card border rounded-xl overflow-hidden transition-colors ${
+                className={`bg-dark-card rounded-xl overflow-hidden transition-colors ${
                   expandedWorkoutId === workout.id 
-                    ? 'border-blue-500 w-full' 
-                    : 'border-dark-border hover:border-blue-500/50'
+                    ? 'w-full' 
+                    : ''
                 }`}
               >
                 {/* Workout Header - clickable to expand */}
