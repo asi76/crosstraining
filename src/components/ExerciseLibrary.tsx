@@ -684,7 +684,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
       {/* Groups List - only shown when NOT searching */}
       {!isSearching && (
-        <div className="mt-4 space-y-3">
+        <div className="space-y-3">
           {groups.map(group => (
           <div key={group.id} className="bg-zinc-900 rounded-xl">
             {/* Group Header */}
