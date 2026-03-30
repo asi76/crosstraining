@@ -367,9 +367,7 @@ function App() {
                           name: workout.name + ' (copia)',
                           createdAt: new Date().toISOString()
                         };
-                        // Save to localStorage
-                        saveWorkout(copy);
-                        // Save to Firebase database
+                        // Save to Firebase database only
                         createWorkout(copy).then(() => {
                           alert('Copia creata e salvata! Ricarica la pagina.');
                         }).catch((error) => {
