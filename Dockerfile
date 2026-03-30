@@ -18,5 +18,5 @@ RUN npm run build
 # Expose port
 EXPOSE 3000
 
-# Start
-CMD ["npm", "start"]
+# Start (serve built frontend)
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "3000"]
