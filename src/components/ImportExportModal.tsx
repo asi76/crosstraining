@@ -12,8 +12,10 @@ interface ImportExportModalProps {
 }
 
 export function ImportExportModal({ exercises = [], groups = [], onClose, onImportComplete }: ImportExportModalProps) {
-  const [isExporting, setIsExporting] = useState(false);
-  const [isImporting, setIsImporting] = useState(false);
+  const [isExportingAll, setIsExportingAll] = useState(false);
+  const [isExportingImages, setIsExportingImages] = useState(false);
+  const [isImportingExercises, setIsImportingExercises] = useState(false);
+  const [isImportingImages, setIsImportingImages] = useState(false);
   const [status, setStatus] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,7 +37,7 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
 
   // Export all exercises with images
   const exportAllExercises = async () => {
-    setIsExporting(true);
+    setIsExportingAll(true);
     setStatus({ type: 'info', message: 'Preparazione export...' });
     
     try {
@@ -89,13 +91,13 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
       console.error('Export error:', error);
       setStatus({ type: 'error', message: 'Errore durante export' });
     } finally {
-      setIsExporting(false);
+      setIsExportingAll(false);
     }
   };
 
   // Export only images
   const exportImages = async () => {
-    setIsExporting(true);
+    setIsExportingImages(true);
     setStatus({ type: 'info', message: 'Preparazione images...' });
     
     try {
@@ -126,13 +128,13 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
       console.error('Export images error:', error);
       setStatus({ type: 'error', message: 'Errore durante export immagini' });
     } finally {
-      setIsExporting(false);
+      setIsExportingImages(false);
     }
   };
 
   // Import exercises from ZIP
   const importExercises = async (file: File) => {
-    setIsImporting(true);
+    setIsImportingExercises(true);
     setStatus({ type: 'info', message: 'Lettura file...' });
     
     try {
@@ -217,14 +219,14 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
       console.error('Import error:', error);
       setStatus({ type: 'error', message: error.message || 'Errore durante import' });
     } finally {
-      setIsImporting(false);
+      setIsImportingExercises(false);
       setImportProgress({ current: 0, total: 0 });
     }
   };
 
   // Import images only
   const importImages = async (file: File) => {
-    setIsImporting(true);
+    setIsImportingImages(true);
     setStatus({ type: 'info', message: 'Lettura immagini...' });
     
     try {
@@ -254,7 +256,7 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
       console.error('Import images error:', error);
       setStatus({ type: 'error', message: error.message || 'Errore durante import immagini' });
     } finally {
-      setIsImporting(false);
+      setIsImportingImages(false);
       setImportProgress({ current: 0, total: 0 });
     }
   };
@@ -293,7 +295,7 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
             </div>
           )}
 
-          {isImporting && importProgress.total > 0 && (
+          {(isImportingExercises || isImportingImages) && importProgress.total > 0 && (
             <div className="text-sm text-zinc-400">
               Progresso: {importProgress.current} / {importProgress.total}
             </div>
@@ -302,10 +304,10 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
           {/* Export All Exercises */}
           <button
             onClick={exportAllExercises}
-            disabled={isExporting || isImporting}
+            disabled={isExportingAll || isExportingImages || isImportingExercises || isImportingImages}
             className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
           >
-            {isExporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+            {isExportingAll ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
             Esporta Esercizi (ZIP completo)
           </button>
 
@@ -319,10 +321,10 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            disabled={isExporting || isImporting}
+            disabled={isExportingAll || isExportingImages || isImportingExercises || isImportingImages}
             className="w-full px-4 py-3 bg-green-600 hover:bg-green-500 disabled:bg-green-800 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
           >
-            {isImporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+            {isImportingExercises ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
             Importa Esercizi (ZIP)
           </button>
 
@@ -330,10 +332,10 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
             {/* Export Images */}
             <button
               onClick={exportImages}
-              disabled={isExporting || isImporting}
+              disabled={isExportingAll || isExportingImages || isImportingExercises || isImportingImages}
               className="w-full px-4 py-3 bg-orange-600 hover:bg-orange-500 disabled:bg-orange-800 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 mb-3"
             >
-              {isExporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+              {isExportingImages ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
               Esporta Immagini (ZIP)
             </button>
 
@@ -347,10 +349,10 @@ export function ImportExportModal({ exercises = [], groups = [], onClose, onImpo
             />
             <button
               onClick={() => imageZipInputRef.current?.click()}
-              disabled={isExporting || isImporting}
+              disabled={isExportingAll || isExportingImages || isImportingExercises || isImportingImages}
               className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              {isImporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+              {isImportingImages ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
               Importa Immagini (ZIP)
             </button>
           </div>
