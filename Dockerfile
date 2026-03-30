@@ -3,11 +3,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Install serve globally
+RUN npm install -g serve
+
+# Copy package files for dependency install
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --only=production && npm cache clean --force
 
 # Copy source
 COPY . .
@@ -15,11 +18,8 @@ COPY . .
 # Build
 RUN npm run build
 
-# Expose port (Zeabur expects 3000)
-EXPOSE 3000
+# Expose the PORT from environment (Zeabur sets this)
+EXPOSE ${PORT:-8080}
 
-# Install serve globally and use it
-RUN npm install -g serve
-
-# Start - serve the built dist folder
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Start - serve the built dist folder on the PORT Zeabur provides
+CMD sh -c "serve -s dist -l $PORT"
