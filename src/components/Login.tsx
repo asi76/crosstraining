@@ -64,7 +64,7 @@ export const Login = ({ isPendingUser, pendingEmail }: LoginProps) => {
               transition={{ delay: 0.2, type: 'spring' }}
               className="bg-primary/20 p-4 rounded-full mb-4"
             >
-              <Dumbbell className="w-12 h-12 text-blue-500" />
+              <Dumbbell className="w-12 h-12 text-blue-400" />
             </motion.div>
             <h1 className="text-2xl font-bold text-white mb-2">Crosstraining</h1>
             <p className="text-gray-400 text-center">Sign in to access your workouts</p>
