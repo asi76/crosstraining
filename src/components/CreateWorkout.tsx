@@ -603,12 +603,15 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
         cardio2Exercises = shuffled.slice(2, 4);
       }
 
+      // Shuffle all exercises before adding to workout (final random order)
+      const shuffledForza = [...forzaExercises].sort(() => Math.random() - 0.5);
+
       // Build the new workout categories
       const newCategories = [
         {
           id: 'forza',
           name: 'Forza',
-          exercises: forzaExercises.map((ex, idx) => ({
+          exercises: shuffledForza.map((ex, idx) => ({
             exerciseId: ex.id,
             exerciseName: ex.name,  // Store name for display
             groupId: ex.group_id,
