@@ -182,7 +182,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   const deleteExercise = async (exerciseId: string) => {
     if (!confirm('Eliminare questo esercizio?')) return;
     await deleteExerciseFromDb(exerciseId);
-    loadExercises();
+    refreshExercises();
   };
 
   // Move exercise to another group
@@ -190,7 +190,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
     await updateExercise(exerciseId, { group_id: newGroupId });
     setShowGroupSelector(null);
     setMoveExerciseId(null);
-    loadExercises();
+    refreshExercises();
   };
 
   // Add new exercise
@@ -268,7 +268,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
     setSelectedExerciseGif(null);
     setCreateGroupId(null);
     setModalMode('view');
-    loadExercises();
+    refreshExercises();
   };
 
   // Save exercise (create or update)
@@ -299,7 +299,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
         });
       }
       
-      loadExercises();
+      refreshExercises();
       handleCloseModal();
     } catch (err) {
       console.error('Error saving exercise:', err);
