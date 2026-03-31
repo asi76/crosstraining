@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Plus, X, Trash2, ChevronDown, ChevronUp, ArrowLeft, Target, Image, Shield, RefreshCw, LogOut, GripVertical, Edit3, ArrowRightLeft, Search } from 'lucide-react';
+import { Plus, X, Trash2, ChevronDown, ChevronUp, ArrowLeft, Target, Image, Shield, RefreshCw, LogOut, GripVertical, Edit3, ArrowRightLeft, Search, Wand, Loader2 } from 'lucide-react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -89,6 +89,9 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<{groupId: string; exerciseIds: string[]}[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // AI Auto-fill functionality
+  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const currentCategory = workoutCategories.find(c => c.id === selectedCategoryId) || workoutCategories[0];
 
@@ -518,6 +521,164 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
     }
   };
 
+  // AI Auto-fill workout
+  const handleAiAutoFill = async () => {
+    if (exercises.length === 0 || groups.length === 0) {
+      alert('Carica dati prima di usare AI');
+      return;
+    }
+
+    setIsAiLoading(true);
+
+    try {
+      // Define the strength groups we need (6 exercises)
+      const strengthGroups = ['chest', 'arms', 'back', 'core', 'shoulders', 'legs'];
+      
+      // Find group IDs by name
+      const getGroupIdByName = (name: string) => {
+        const group = groups.find(g => g.name.toLowerCase().includes(name.toLowerCase()));
+        return group?.id || null;
+      };
+
+      // Get exercises for a group
+      const getGroupExercises = (groupId: string): Exercise[] => {
+        return exercises.filter(e => e.group_id === groupId);
+      };
+
+      // Count muscles in a category
+      const countMuscles = (exs: Exercise[]) => {
+        const counts: Record<string, number> = {};
+        exs.forEach(ex => {
+          ex.muscles?.forEach((m: string) => {
+            counts[m] = (counts[m] || 0) + 1;
+          });
+        });
+        return counts;
+      };
+
+      // Check if adding exercise would cause red tag (count >= 4)
+      const wouldBeRed = (currentCounts: Record<string, number>, exercise: Exercise): boolean => {
+        for (const muscle of exercise.muscles || []) {
+          if ((currentCounts[muscle] || 0) >= 3) return true; // Adding would make it 4+
+        }
+        return false;
+      };
+
+      // Pick a random exercise from a group that doesn't cause red
+      const pickExercise = (
+        groupId: string, 
+        currentExs: Exercise[], 
+        maxRetries: number = 20
+      ): Exercise | null => {
+        const groupExs = getGroupExercises(groupId);
+        const currentCounts = countMuscles(currentExs);
+        const usedIds = new Set(currentExs.map(e => e.id));
+        
+        for (let i = 0; i < maxRetries; i++) {
+          const candidates = groupExs.filter(e => !usedIds.has(e.id));
+          if (candidates.length === 0) break;
+          
+          const randomEx = candidates[Math.floor(Math.random() * candidates.length)];
+          if (!wouldBeRed(currentCounts, randomEx)) {
+            return randomEx;
+          }
+        }
+        
+        // If we couldn't find non-red, just return any random (fallback)
+        const available = groupExs.filter(e => !usedIds.has(e.id));
+        return available.length > 0 
+          ? available[Math.floor(Math.random() * available.length)]
+          : null;
+      };
+
+      // ======== FORZA ========
+      const forzaExercises: Exercise[] = [];
+      for (const groupName of strengthGroups) {
+        const groupId = getGroupIdByName(groupName);
+        if (groupId) {
+          const picked = pickExercise(groupId, forzaExercises);
+          if (picked) forzaExercises.push(picked);
+        }
+      }
+
+      // ======== CARDIO ========
+      // Find cardio group(s) - look for "cardio", "hiit", "aerobico"
+      const cardioGroupId = getGroupIdByName('cardio') || getGroupIdByName('hiit') || getGroupIdByName('aerobico');
+      let cardio1Exercises: Exercise[] = [];
+      let cardio2Exercises: Exercise[] = [];
+
+      if (cardioGroupId) {
+        const cardioExs = getGroupExercises(cardioGroupId);
+        const shuffled = [...cardioExs].sort(() => Math.random() - 0.5);
+        
+        // Cardio 1: first 2
+        cardio1Exercises = shuffled.slice(0, 2);
+        // Cardio 2: next 2 different ones
+        cardio2Exercises = shuffled.slice(2, 4);
+      }
+
+      // Build the new workout categories
+      const newCategories = [
+        {
+          id: 'forza',
+          name: 'Forza',
+          exercises: forzaExercises.map((ex, idx) => ({
+            exerciseId: ex.id,
+            groupId: ex.group_id,
+            name: ex.name,
+            muscles: ex.muscles,
+            reps: ex.reps || 10,
+            sets: 3,
+            rest: 60,
+            difficulty: ex.difficulty || 'medium',
+            gifUrl: getGifUrl(ex.id)
+          }))
+        },
+        {
+          id: 'cardio1',
+          name: 'Cardio 1',
+          exercises: cardio1Exercises.map((ex) => ({
+            exerciseId: ex.id,
+            groupId: ex.group_id,
+            name: ex.name,
+            muscles: ex.muscles,
+            time: 45,
+            sets: 1,
+            rest: 15,
+            difficulty: ex.difficulty || 'medium',
+            gifUrl: getGifUrl(ex.id)
+          }))
+        },
+        {
+          id: 'cardio2',
+          name: 'Cardio 2',
+          exercises: cardio2Exercises.map((ex) => ({
+            exerciseId: ex.id,
+            groupId: ex.group_id,
+            name: ex.name,
+            muscles: ex.muscles,
+            time: 45,
+            sets: 1,
+            rest: 15,
+            difficulty: ex.difficulty || 'medium',
+            gifUrl: getGifUrl(ex.id)
+          }))
+        }
+      ];
+
+      // Update state
+      setWorkoutCategories(newCategories);
+      setSelectedCategoryId('forza');
+      setWorkoutName(workoutName || 'Scheda AI');
+
+    } catch (error) {
+      console.error('[handleAiAutoFill] Error:', error);
+      alert('Errore nella generazione AI: ' + (error as Error).message);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   const getExerciseById = (id: string) => exercises.find(e => e.id === id);
 
   return (
@@ -538,6 +699,18 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
             </h2>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={handleAiAutoFill}
+              disabled={isAiLoading}
+              className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50"
+              title="AI Auto-fill"
+            >
+              {isAiLoading ? (
+                <Loader2 className="w-5 h-5 text-white animate-spin" />
+              ) : (
+                <Wand className="w-5 h-5 text-purple-400" />
+              )}
+            </button>
             <button
               onClick={() => {
                 setExpandedGroups(new Set());
