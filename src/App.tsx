@@ -210,7 +210,7 @@ function App() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Sticky Header - dark black */}
-      <div className="sticky top-0 z-40 bg-zinc-900 backdrop-blur-sm rounded-b-xl">
+      <div className="sticky top-0 z-40 bg-zinc-950 backdrop-blur-sm rounded-b-xl">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -283,7 +283,7 @@ function App() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setCurrentView('library')}
-            className="bg-zinc-900 rounded-2xl p-5 text-left group hover:bg-zinc-800 transition-colors flex items-center gap-4"
+            className="bg-zinc-950 rounded-2xl p-5 text-left group hover:bg-zinc-800 transition-colors flex items-center gap-4"
           >
             <div className="bg-zinc-700 w-12 h-12 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-zinc-600 transition-colors">
               <Library className="w-6 h-6 text-white" />
@@ -303,7 +303,7 @@ function App() {
         </div>
 
         {savedWorkouts.length === 0 ? (
-          <div className="bg-zinc-900 rounded-xl p-8 text-center">
+          <div className="bg-zinc-950 rounded-xl p-8 text-center">
             <Dumbbell className="w-12 h-12 text-gray-600 mx-auto mb-4" />
             <p className="text-gray-400 mb-2">Nessuna scheda salvata</p>
             <p className="text-gray-500 text-sm mb-4">Crea la tua prima scheda</p>
@@ -323,7 +323,7 @@ function App() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className={`bg-zinc-900 rounded-xl overflow-hidden transition-colors ${
+                className={`bg-zinc-950 rounded-xl overflow-hidden transition-colors ${
                   expandedWorkoutId === workout.id 
                     ? 'w-full' 
                     : ''
@@ -516,7 +516,7 @@ function App() {
           onClick={() => setViewingExercise(null)}
         >
           <div 
-            className="bg-zinc-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+            className="bg-zinc-950 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
@@ -534,7 +534,7 @@ function App() {
               </button>
             </div>
             <div className="flex flex-col md:flex-row max-h-[calc(80vh-70px)]">
-              <div className="md:w-1/2 bg-zinc-900 flex items-center justify-center p-4 min-h-[200px]">
+              <div className="md:w-1/2 bg-zinc-950 flex items-center justify-center p-4 min-h-[200px]">
                 {viewingExerciseGif ? (
                   <img 
                     src={viewingExerciseGif} 
