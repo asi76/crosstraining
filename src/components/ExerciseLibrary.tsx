@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Plus, Trash2, ArrowRightLeft, X, ArrowLeft, Edit3, RefreshCw, LogOut, Download, Upload, Image, Search } from 'lucide-react';
-import { getGroups, getExercises, createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings } from '../firebase';
+import { createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings } from '../firebase';
 import { getGifUrl } from '../data/gifMapping';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import { ImportExportModal } from './ImportExportModal';
 import { useAuth } from '../hooks/useAuth';
+import { useExercises } from '../hooks/useExercises';
 import { showNotification } from './NotificationModal';
 
 interface ExerciseGroup {
@@ -33,8 +34,10 @@ interface ExerciseLibraryProps {
 
 export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   const { signOut } = useAuth();
-  const [groups, setGroups] = useState<ExerciseGroup[]>([]);
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  
+  // Use shared exercises context (fetched once, shared across components)
+  const { groups, exercises, getExercisesByGroup: getExercisesByGroupCtx, refreshGroups, refreshExercises } = useExercises();
+  
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedExerciseGif, setSelectedExerciseGif] = useState<string | null>(null);
@@ -61,7 +64,6 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   const [editGroupName, setEditGroupName] = useState('');
   const [editGroupColor, setEditGroupColor] = useState('blue');
   const [exerciseGifs, setExerciseGifs] = useState<Record<string, boolean>>({});
-  const [allExercisesForGifCount, setAllExercisesForGifCount] = useState<any[]>([]);
   
   // Search functionality
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,36 +91,20 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
     };
   }, []);
 
-  // Load all exercises for GIF counting
+  // Load all exercises for GIF counting - uses context (no-op, context handles loading)
   const loadAllExercisesForGifCount = useCallback(async () => {
-    const data = await getExercises();
-    
-    if (data) {
-      setAllExercisesForGifCount(data.map((e: any) => ({ id: e.id, group_id: e.group_id })));
-    }
+    // Data comes from context, no need to reload
   }, []);
 
-  // Load groups from Firebase
+  // Load groups from Firebase - uses context (no-op, context handles loading)
   const loadGroups = useCallback(async () => {
-    const data = await getGroups();
-    if (data) {
-      setGroups(data);
-    }
+    // Data comes from context, no need to reload
   }, []);
 
-  // Load exercises from Firebase
+  // Load exercises from Firebase - uses context (no-op, context handles loading)
   const loadExercises = useCallback(async () => {
-    const data = await getExercises();
-    if (data) {
-      setExercises(data);
-    }
+    // Data comes from context, no need to reload
   }, []);
-
-  useEffect(() => {
-    loadGroups();
-    loadExercises();
-    loadAllExercisesForGifCount();
-  }, [loadGroups, loadExercises, loadAllExercisesForGifCount]);
 
   // Available colors for groups
   const groupColors = [
@@ -707,7 +693,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                   })()}
                 </span>
                 {(() => {
-                  const groupExercises = allExercisesForGifCount.filter(e => e.group_id === group.id);
+                  const groupExercises = exercises.filter(e => e.group_id === group.id);
                   const withGif = groupExercises.filter(e => exerciseGifs[e.id]).length;
                   const missing = groupExercises.length - withGif;
                   if (missing > 0) {

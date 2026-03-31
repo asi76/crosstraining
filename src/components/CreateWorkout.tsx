@@ -3,10 +3,11 @@ import { Plus, X, Trash2, ChevronDown, ChevronUp, ArrowLeft, Target, Image, Shie
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { getGroups, getExercises, createWorkout, updateWorkout } from '../firebase';
+import { createWorkout, updateWorkout, updateExercise } from '../firebase';
 import { getGifUrl } from '../data/gifMapping';
 import { Workout } from '../data/types';
 import { useAuth } from '../hooks/useAuth';
+import { useExercises } from '../hooks/useExercises';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 
 interface ExerciseGroup {
@@ -73,8 +74,10 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
   // Log for debugging
   console.log('[CreateWorkout] editWorkout:', editWorkout, 'isEditing:', isEditing);
   const [selectedCategoryId, setSelectedCategoryId] = useState('forza');
-  const [groups, setGroups] = useState<ExerciseGroup[]>([]);
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  
+  // Use shared exercises context (fetched once, shared across components)
+  const { groups, exercises, getExercisesByGroup: getExercisesByGroupCtx } = useExercises();
+  
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [viewingExercise, setViewingExercise] = useState<Exercise | null>(null);
   const [viewingExerciseGif, setViewingExerciseGif] = useState<string | null>(null);
@@ -260,26 +263,9 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
     action();
   };
 
-  // Load groups and exercises from Firebase
-  const loadData = async () => {
-    const [groupsData, exercisesData] = await Promise.all([
-      getGroups(),
-      getExercises()
-    ]);
-    
-    if (groupsData) setGroups(groupsData);
-    if (exercisesData) setExercises(exercisesData);
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  // Get exercises for a specific group (sorted alphabetically)
+  // Get exercises for a specific group (sorted alphabetically) - uses context
   const getExercisesByGroup = (groupId: string): Exercise[] => {
-    return exercises
-      .filter(e => e.group_id === groupId)
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return getExercisesByGroupCtx(groupId).sort((a, b) => a.name.localeCompare(b.name));
   };
 
   const toggleGroup = (groupId: string) => {
@@ -1252,7 +1238,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
             setEditingExerciseInModal(false);
           }}
           onSave={async (exerciseData) => {
-            // Update exercise in database and local state
+            // Update exercise in database 
             try {
               await updateExercise(fullEditModalExercise.id, {
                 name: exerciseData.name,
@@ -1264,20 +1250,10 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                 description: exerciseData.description,
               });
 
-              if (error) {
-                console.error('Error updating exercise:', error);
-              } else {
-                // Update local exercises state immediately
-                setExercises(prev => prev.map(ex => 
-                  ex.id === fullEditModalExercise.id 
-                    ? { ...ex, ...exerciseData }
-                    : ex
-                ));
-                // Also update viewingExercise so read-only modal shows updated data
-                setViewingExercise(prev => prev ? { ...prev, ...exerciseData } : null);
-              }
+              // Update viewingExercise so read-only modal shows updated data
+              setViewingExercise(prev => prev ? { ...prev, ...exerciseData } : null);
             } catch (err) {
-              console.error('Error saving exercise:', err);
+              console.error('Error updating exercise:', err);
             }
             setFullEditModalExercise(null);
           }}

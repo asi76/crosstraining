@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from './hooks/useAuth';
 import { useWorkout } from './hooks/useWorkout';
+import { ExercisesProvider, useExercises } from './hooks/useExercises';
 import { Login } from './components/Login';
 import { AdminPanel } from './components/AdminPanel';
 import { CreateWorkout } from './components/CreateWorkout';
@@ -26,7 +27,7 @@ import { ExerciseLibrary } from './components/ExerciseLibrary';
 import { WorkoutDisplay } from './components/WorkoutDisplay';
 import { NotificationModal } from './components/NotificationModal';
 import { Workout } from './data/types';
-import { getExercises, createWorkout } from './firebase';
+import { createWorkout } from './firebase';
 import { getGifUrl } from './data/gifMapping';
 
 type View = 'home' | 'create' | 'library' | 'workout' | 'admin';
@@ -46,6 +47,7 @@ function App() {
     deleteWorkout,
     duplicateWorkout
   } = useWorkout();
+  const { exercises: allExercises } = useExercises();
   const [currentView, setCurrentView] = useState<View>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('lastView') as View) || 'home';
@@ -59,16 +61,6 @@ function App() {
   const [viewingExerciseData, setViewingExerciseData] = useState<any>(null);
   const [viewingExerciseGif, setViewingExerciseGif] = useState<string | null>(null);
   const [editingWorkout, setEditingWorkout] = useState<Workout | null>(null);
-  const [allExercises, setAllExercises] = useState<any[]>([]);
-
-  // Load all exercises for display (muscles, tipo, difficulty)
-  useEffect(() => {
-    async function loadExercises() {
-      const data = await getExercises();
-      if (data) setAllExercises(data);
-    }
-    loadExercises();
-  }, []);
 
   useEffect(() => {
     if (role === 'enabled' || role === 'admin') {
