@@ -312,7 +312,7 @@ export function ExerciseDetailModal({
   const searchGif = () => {
     // Use editName if in edit/create mode, otherwise use exercise.name
     const nameToSearch = (isEditing ? editName : exercise.name) || '';
-    const query = encodeURIComponent(`${nameToSearch} gif`);
+    const query = encodeURIComponent(`${nameToSearch} exercise gif`);
     const searchUrl = `https://www.google.com/search?tbs=itp:animated&tbm=isch&q=${query}`;
     const width = 600;
     const height = 400;
