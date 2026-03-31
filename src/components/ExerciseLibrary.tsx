@@ -78,7 +78,7 @@ function SortableGroup({
     <div 
       ref={setNodeRef} 
       style={style}
-      className={`bg-zinc-900 rounded-xl ${isDragging ? 'shadow-2xl ring-2 ring-blue-500' : ''}`}
+      className={`bg-zinc-950 rounded-xl ${isDragging ? 'shadow-2xl ring-2 ring-blue-500' : ''}`}
     >
       {/* Group Header */}
       <button
@@ -546,7 +546,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-        <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-zinc-950 rounded-2xl w-full max-w-md overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h2 className="text-lg font-bold text-white">Sposta esercizio</h2>
             <button
@@ -583,7 +583,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-        <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-zinc-950 rounded-2xl w-full max-w-md overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h2 className="text-lg font-bold text-white">Aggiungi Gruppo</h2>
             <button
@@ -639,7 +639,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-        <div className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden">
+        <div className="bg-zinc-950 rounded-2xl w-full max-w-md overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
             <h2 className="text-lg font-bold text-white">Modifica Gruppo</h2>
             <button
@@ -689,7 +689,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       {/* Sticky Header - dark black */}
-      <div className="sticky top-0 z-40 bg-zinc-900 backdrop-blur-sm rounded-b-xl -mx-4 px-4 py-4">
+      <div className="sticky top-0 z-40 bg-zinc-950 backdrop-blur-sm rounded-b-xl -mx-4 px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -791,7 +791,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
             Risultati per "{searchQuery}" ({searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi)
           </div>
           {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0) === 0 ? (
-            <div className="bg-zinc-900 rounded-xl px-5 py-8 text-center text-zinc-500">
+            <div className="bg-zinc-950 rounded-xl px-5 py-8 text-center text-zinc-500">
               Nessun esercizio trovato
             </div>
           ) : (
@@ -805,7 +805,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
                 return (
                   <div
                     key={exercise.id}
-                    className="bg-zinc-900 rounded-xl px-5 py-4 hover:bg-zinc-800/30 transition-colors"
+                    className="bg-zinc-950 rounded-xl px-5 py-4 hover:bg-zinc-800/30 transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
