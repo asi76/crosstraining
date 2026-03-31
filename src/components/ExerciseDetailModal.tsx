@@ -371,7 +371,7 @@ export function ExerciseDetailModal({
         {/* Content - Two columns on desktop, stacked on mobile portrait */}
         <div className="flex flex-col md:flex-row h-[calc(85vh-80px)]">
           {/* Left - GIF + Upload Area */}
-          <div className={`bg-zinc-950 flex flex-col p-4 ${isEditing ? 'md:w-full' : 'md:w-1/2'} flex-1`}>
+          <div className={`bg-zinc-900 flex flex-col p-4 ${isEditing ? 'md:w-full' : 'md:w-1/2'} flex-1`}>
             {/* GIF Display */}
             <div className="flex-1 flex items-center justify-center min-h-[200px]">
               {localGifUrl && !imageError ? (

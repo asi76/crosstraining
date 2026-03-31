@@ -210,7 +210,7 @@ function App() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Sticky Header - dark black */}
-      <div className="sticky top-0 z-40 bg-zinc-950 backdrop-blur-sm">
+      <div className="sticky top-0 z-40 bg-zinc-900 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -534,7 +534,7 @@ function App() {
               </button>
             </div>
             <div className="flex flex-col md:flex-row max-h-[calc(80vh-70px)]">
-              <div className="md:w-1/2 bg-zinc-950 flex items-center justify-center p-4 min-h-[200px]">
+              <div className="md:w-1/2 bg-zinc-900 flex items-center justify-center p-4 min-h-[200px]">
                 {viewingExerciseGif ? (
                   <img 
                     src={viewingExerciseGif} 
