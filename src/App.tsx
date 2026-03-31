@@ -351,7 +351,7 @@ function App() {
                       <h3 className="text-white font-semibold">{workout.name}</h3>
                       <span className="text-gray-500 text-sm">
                         {formatDate(workout.createdAt)} • {' '}
-                        {workout.stations.reduce((acc, s) => acc + s.exercises.length, 0)} esercizi
+                        {workout.stations.reduce((acc, s) => acc + s.exercises.length, 0)} ex
                       </span>
                     </div>
                   </div>

@@ -849,7 +849,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
         {/* Search Results Info */}
         {isSearching && searchResults.length > 0 && (
           <div className="text-sm text-zinc-400">
-            Trovati {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi
+            Trovati {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} ex
           </div>
         )}
         {isSearching && searchResults.length === 0 && searchQuery.trim() && (
@@ -936,7 +936,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                       {group.label}
                     </span>
                     <span className="text-base text-zinc-400">
-                      {getExercisesByGroup(group.id).length} esercizi
+                      {getExercisesByGroup(group.id).length} ex
                     </span>
                   </div>
                   {expandedGroups.has(group.id) ? (
