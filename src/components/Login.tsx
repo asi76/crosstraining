@@ -66,7 +66,7 @@ export const Login = ({ isPendingUser, pendingEmail }: LoginProps) => {
             >
               <Dumbbell className="w-12 h-12 text-blue-400" />
             </motion.div>
-            <h1 className="text-2xl font-bold text-white mb-2">Crosstraining</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">Crosstraining</h1>
             <p className="text-gray-400 text-center">Sign in to access your workouts</p>
           </div>
 
