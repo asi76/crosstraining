@@ -40,6 +40,10 @@ export const deleteGroup = async (id: string) => {
   await deleteDoc(doc(db, 'exercise_groups', id));
 };
 
+export const updateGroup = async (id: string, data: any) => {
+  await updateDoc(doc(db, 'exercise_groups', id), data);
+};
+
 // ============ EXERCISES (mostly static - read once) ============
 export const getExercises = async (groupId?: string) => {
   if (groupId) {

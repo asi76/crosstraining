@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Plus, Trash2, ArrowRightLeft, X, ArrowLeft, Edit3, RefreshCw, LogOut, Download, Upload, Image, Search } from 'lucide-react';
-import { createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings, createGroup, deleteGroup as deleteGroupFromDb } from '../firebase';
+import { createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings, createGroup, deleteGroup as deleteGroupFromDb, updateGroup } from '../firebase';
 import { getGifUrl } from '../data/gifMapping';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import { ImportExportModal } from './ImportExportModal';
@@ -142,11 +142,20 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   const saveEditGroup = async () => {
     if (!editingGroup || !editGroupName.trim()) return;
     
-    // Note: Firebase doesn't have updateGroup in the provided API
-    // This would need to be added to firebase.ts
+    try {
+      const colorClass = groupColors.find(c => c.id === editGroupColor)?.class || groupColors[0].class;
+      await updateGroup(editingGroup.id, {
+        name: editGroupName.trim().toLowerCase().replace(/\s+/g, '-'),
+        label: editGroupName.trim(),
+        color_class: colorClass
+      });
+      refreshGroups();
+    } catch (error) {
+      console.error('Error updating group:', error);
+      showNotification('Errore aggiornamento gruppo', 'error');
+    }
     
     setEditingGroup(null);
-    loadGroups();
   };
 
   // Get exercises for a specific group (sorted alphabetically)
