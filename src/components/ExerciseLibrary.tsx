@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronDown, ChevronUp, Plus, Trash2, ArrowRightLeft, X, ArrowLeft, Edit3, RefreshCw, LogOut, Download, Upload, Image, Search } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, Trash2, ArrowRightLeft, X, ArrowLeft, Edit3, RefreshCw, LogOut, Download, Upload, Image, Search, GripVertical } from 'lucide-react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings, createGroup, deleteGroup as deleteGroupFromDb, updateGroup } from '../firebase';
 import { getGifUrl } from '../data/gifMapping';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
@@ -32,11 +34,167 @@ interface ExerciseLibraryProps {
   onBack: () => void;
 }
 
+// Sortable Group component for drag-and-drop reordering
+function SortableGroup({ 
+  group, 
+  children, 
+  isExpanded,
+  onToggle,
+  onAddExercise,
+  onEditGroup,
+  onDeleteGroup,
+  exerciseCount,
+  missingGifs,
+  groupColors
+}: { 
+  group: ExerciseGroup; 
+  children: React.ReactNode;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onAddExercise: () => void;
+  onEditGroup: () => void;
+  onDeleteGroup: () => void;
+  exerciseCount: number;
+  missingGifs: number;
+  groupColors: { id: string; class: string }[];
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: group.id });
+
+  const style = {
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : 1,
+  };
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      style={style}
+      className={`bg-zinc-900 rounded-xl ${isDragging ? 'shadow-2xl ring-2 ring-blue-500' : ''}`}
+    >
+      {/* Group Header */}
+      <button
+        id={`group-header-${group.id}`}
+        onClick={onToggle}
+        className="w-full px-5 py-4 flex items-center justify-between hover:bg-zinc-800/50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          {/* Drag Handle */}
+          <div 
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 hover:bg-zinc-700 rounded transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GripVertical className="w-5 h-5 text-zinc-500" />
+          </div>
+          <span className={`px-3 py-1 rounded text-sm font-semibold border ${group.color_class}`}>
+            {group.label}
+          </span>
+          <span className="text-base text-zinc-400">
+            {exerciseCount} esercizi{missingGifs > 0 ? ` (${missingGifs} foto mancanti)` : ''}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddExercise();
+            }}
+            className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors"
+            title="Aggiungi esercizio"
+          >
+            <Plus className="w-4 h-4 text-white" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditGroup();
+            }}
+            className="p-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
+            title="Modifica gruppo"
+          >
+            <Edit3 className="w-4 h-4 text-white" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (confirm('Eliminare il gruppo e tutti i suoi esercizi?')) {
+                onDeleteGroup();
+              }
+            }}
+            className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
+            title="Elimina gruppo"
+          >
+            <Trash2 className="w-4 h-4 text-red-400" />
+          </button>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-zinc-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-zinc-400" />
+          )}
+        </div>
+      </button>
+
+      {/* Expanded Content */}
+      {isExpanded && children}
+    </div>
+  );
+}
+
 export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   const { signOut } = useAuth();
   
   // Use shared exercises context (fetched once, shared across components)
   const { groups, exercises, getExercisesByGroup: getExercisesByGroupCtx, refreshGroups, refreshExercises } = useExercises();
+  
+  // DnD sensors for group reordering
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Handle group reordering
+  const handleGroupDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = groups.findIndex(g => g.id === active.id);
+      const newIndex = groups.findIndex(g => g.id === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        // Reorder groups locally
+        const newGroups = [...groups];
+        const [movedGroup] = newGroups.splice(oldIndex, 1);
+        newGroups.splice(newIndex, 0, movedGroup);
+        
+        // Update sort_order for all groups in Firebase
+        try {
+          await Promise.all(newGroups.map((g, index) => 
+            updateGroup(g.id, { sort_order: index })
+          ));
+          refreshGroups();
+        } catch (error) {
+          console.error('Error reordering groups:', error);
+          showNotification('Errore riordinamento gruppi', 'error');
+        }
+      }
+    }
+  };
   
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -696,165 +854,119 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
       {/* Groups List - only shown when NOT searching */}
       {!isSearching && (
-        <div className="space-y-3">
-          {groups.map(group => (
-          <div key={group.id} className="bg-zinc-900 rounded-xl">
-            {/* Group Header */}
-            <button
-              id={`group-header-${group.id}`}
-              onClick={() => toggleGroup(group.id)}
-              className="w-full px-5 py-4 flex items-center justify-between hover:bg-zinc-800/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded text-sm font-semibold border ${group.color_class}`}>
-                  {group.label}
-                </span>
-                <span className="text-base text-zinc-400">
-                  {/* When searching, show filtered count */}
-                  {(() => {
-                    const searchResult = searchResults.find(r => r.groupId === group.id);
-                    const totalCount = getExercisesByGroup(group.id).length;
-                    const filteredCount = isSearching && searchResult ? searchResult.exerciseIds.length : totalCount;
-                    return `${filteredCount} esercizi${isSearching && filteredCount !== totalCount ? ` (${totalCount} totali)` : ''}`;
-                  })()}
-                </span>
-                {(() => {
-                  const groupExercises = exercises.filter(e => e.group_id === group.id);
-                  const withGif = groupExercises.filter(e => exerciseGifs[e.id]).length;
-                  const missing = groupExercises.length - withGif;
-                  if (missing > 0) {
-                    return <span className="text-sm text-red-400 ml-1">({missing} foto mancanti)</span>;
-                  }
-                  return null;
-                })()}
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddExercise(group.id);
-                  }}
-                  className="p-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors"
-                  title="Aggiungi esercizio"
-                >
-                  <Plus className="w-4 h-4 text-white" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditGroup(group);
-                  }}
-                  className="p-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg transition-colors"
-                  title="Modifica gruppo"
-                >
-                  <Edit3 className="w-4 h-4 text-white" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (confirm('Eliminare il gruppo e tutti i suoi esercizi?')) {
-                      deleteGroup(group.id);
-                    }
-                  }}
-                  className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
-                  title="Elimina gruppo"
-                >
-                  <Trash2 className="w-4 h-4 text-red-400" />
-                </button>
-                {expandedGroups.has(group.id) ? (
-                  <ChevronUp className="w-5 h-5 text-zinc-400" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-zinc-400" />
-                )}
-              </div>
-            </button>
-
-            {/* Expanded Content */}
-            {expandedGroups.has(group.id) && (
-              <div className="max-h-96 overflow-y-auto scrollbar-dark">
-                {(() => {
-                  const exercisesList = getExercisesByGroup(group.id);
-                  if (exercisesList.length === 0) {
-                    return <div className="px-5 py-8 text-center text-zinc-500">Nessun esercizio</div>;
-                  }
-                  return exercisesList.map(exercise => (
-                    <div key={exercise.id} className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <button
-                              onClick={() => handleViewExercise(exercise)}
-                              className="text-base font-medium text-white hover:text-blue-400 cursor-pointer transition-colors text-left flex items-center gap-2"
-                            >
-                              {exercise.name}
-                              {exerciseGifs[exercise.id] && (
-                                <span className="text-green-400 text-xs font-medium flex items-center gap-0.5">
-                                  <Image className="w-3 h-3" /> GIF
-                                </span>
-                              )}
-                            </button>
-                            <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
-                              exercise.tipo === 'aerobico' 
-                                ? 'bg-blue-500/20 text-blue-400' 
-                                : 'bg-orange-500/20 text-orange-400'
-                            }`}>
-                              {exercise.tipo === 'aerobico' ? 'Aerobico' : 'Anaerobico'}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between mt-1">
-                            <div className="flex flex-wrap gap-1">
-                              {exercise.muscles.map((muscle, idx) => (
-                                <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
-                              ))}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleGroupDragEnd}
+        >
+          <SortableContext
+            items={groups.map(g => g.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-3">
+              {groups.map(group => {
+                const groupExercises = exercises.filter(e => e.group_id === group.id);
+                const missingGifs = groupExercises.length - groupExercises.filter(e => exerciseGifs[e.id]).length;
+                return (
+                  <SortableGroup
+                    key={group.id}
+                    group={group}
+                    isExpanded={expandedGroups.has(group.id)}
+                    onToggle={() => toggleGroup(group.id)}
+                    onAddExercise={() => handleAddExercise(group.id)}
+                    onEditGroup={() => handleEditGroup(group)}
+                    onDeleteGroup={() => deleteGroup(group.id)}
+                    exerciseCount={getExercisesByGroup(group.id).length}
+                    missingGifs={missingGifs}
+                    groupColors={groupColors}
+                  >
+                    {/* Expanded Content */}
+                    <div className="max-h-96 overflow-y-auto scrollbar-dark">
+                      {(() => {
+                        const exercisesList = getExercisesByGroup(group.id);
+                        if (exercisesList.length === 0) {
+                          return <div className="px-5 py-8 text-center text-zinc-500">Nessun esercizio</div>;
+                        }
+                        return exercisesList.map(exercise => (
+                          <div key={exercise.id} className="px-5 py-4 border-b border-zinc-800/50 last:border-b-0 hover:bg-zinc-800/30 transition-colors">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <button
+                                    onClick={() => handleViewExercise(exercise)}
+                                    className="text-base font-medium text-white hover:text-blue-400 cursor-pointer transition-colors text-left flex items-center gap-2"
+                                  >
+                                    {exercise.name}
+                                    {exerciseGifs[exercise.id] && (
+                                      <span className="text-green-400 text-xs font-medium flex items-center gap-0.5">
+                                        <Image className="w-3 h-3" /> GIF
+                                      </span>
+                                    )}
+                                  </button>
+                                  <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
+                                    exercise.tipo === 'aerobico' 
+                                      ? 'bg-blue-500/20 text-blue-400' 
+                                      : 'bg-orange-500/20 text-orange-400'
+                                  }`}>
+                                    {exercise.tipo === 'aerobico' ? 'Aerobico' : 'Anaerobico'}
+                                  </span>
+                                </div>
+                                <div className="flex items-center justify-between mt-1">
+                                  <div className="flex flex-wrap gap-1">
+                                    {exercise.muscles.map((muscle, idx) => (
+                                      <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">{muscle}</span>
+                                    ))}
+                                  </div>
+                                  <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
+                                    exercise.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
+                                    exercise.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
+                                    'bg-red-500/20 text-red-400'
+                                  }`}>
+                                    {exercise.difficulty === 'beginner' ? 'Principiante' :
+                                     exercise.difficulty === 'intermediate' ? 'Intermedi' : 'Avanzato'}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => {
+                                    setMoveExerciseId(exercise.id);
+                                    setShowGroupSelector(exercise.id);
+                                  }}
+                                  className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
+                                  title="Sposta"
+                                >
+                                  <ArrowRightLeft className="w-4 h-4 text-zinc-400" />
+                                </button>
+                                <button
+                                  onClick={() => deleteExercise(exercise.id)}
+                                  className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
+                                  title="Elimina"
+                                >
+                                  <Trash2 className="w-4 h-4 text-red-400" />
+                                </button>
+                              </div>
                             </div>
-                            <span className={`text-xs px-1.5 py-0.5 rounded ml-2 ${
-                              exercise.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
-                              exercise.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-red-500/20 text-red-400'
-                            }`}>
-                              {exercise.difficulty === 'beginner' ? 'Principiante' :
-                               exercise.difficulty === 'intermediate' ? 'Intermedio' : 'Avanzato'}
-                            </span>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => {
-                              setMoveExerciseId(exercise.id);
-                              setShowGroupSelector(exercise.id);
-                            }}
-                            className="p-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors"
-                            title="Sposta"
-                          >
-                            <ArrowRightLeft className="w-4 h-4 text-zinc-400" />
-                          </button>
-                          <button
-                            onClick={() => deleteExercise(exercise.id)}
-                            className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
-                            title="Elimina"
-                          >
-                            <Trash2 className="w-4 h-4 text-red-400" />
-                          </button>
-                        </div>
+                        ));
+                      })()}
+                      {/* Add exercise button at bottom */}
+                      <div className="px-5 py-3 border-t border-zinc-800/50">
+                        <button
+                          onClick={() => handleAddExercise(group.id)}
+                          className="flex items-center gap-2 text-white hover:text-blue-400 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Aggiungi esercizio
+                        </button>
                       </div>
                     </div>
-                  ));
-                })()}
-                {/* Add exercise button at bottom */}
-                <div className="px-5 py-3 border-t border-zinc-800/50">
-                  <button
-                    onClick={() => handleAddExercise(group.id)}
-                    className="flex items-center gap-2 text-white hover:text-blue-400 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Aggiungi esercizio
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-        </div>
+                  </SortableGroup>
+                );
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       {/* Add Group Button */}
