@@ -100,7 +100,7 @@ function SortableGroup({
             {group.label}
           </span>
           <span className="text-base text-zinc-400">
-            {exerciseCount} esercizi{missingGifs > 0 ? ` (${missingGifs} foto mancanti)` : ''}
+            {exerciseCount} ex{missingGifs > 0 ? ` (${missingGifs} foto mancanti)` : ''}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -776,7 +776,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
         {/* Search Results Info */}
         {isSearching && searchResults.length > 0 && (
           <div className="mt-2 text-sm text-zinc-400">
-            Trovati {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi in {searchResults.length} gruppi
+            Trovati {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} ex in {searchResults.length} gruppi
           </div>
         )}
         {isSearching && searchResults.length === 0 && searchQuery.trim() && (
@@ -790,7 +790,7 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
       {isSearching && searchQuery.trim() && (
         <div className="mt-4 space-y-3">
           <div className="text-sm text-zinc-400">
-            Risultati per "{searchQuery}" ({searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} esercizi)
+            Risultati per "{searchQuery}" ({searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0)} ex)
           </div>
           {searchResults.reduce((acc, r) => acc + r.exerciseIds.length, 0) === 0 ? (
             <div className="bg-zinc-900 rounded-xl px-5 py-8 text-center text-zinc-500">
