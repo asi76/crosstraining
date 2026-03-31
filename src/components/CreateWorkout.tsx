@@ -803,7 +803,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
         >
           <div>
             {currentCategory.exercises.length === 0 ? (
-              <p className="text-zinc-500 text-sm">Nessun esercizio. Trascina dalla lista sotto.</p>
+              <p className="text-zinc-500 text-sm">Nessun esercizio. Aggiungi dalla lista sotto.</p>
             ) : (
               currentCategory.exercises.map((ex: any, index: number) => (
                 <SortableExerciseItem key={`${selectedCategoryId}-${index}`} ex={ex} index={index} />
