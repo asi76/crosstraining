@@ -50,7 +50,17 @@ export const Login = ({ isPendingUser, pendingEmail }: LoginProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-dark-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-dark-bg">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-40 bg-zinc-900 backdrop-blur-sm rounded-b-xl border-b-2 border-black/30 -mx-4 px-4 py-4">
+        <div className="flex items-center gap-3">
+          <Dumbbell className="w-6 h-6 text-blue-400" />
+          <h1 className="text-xl font-bold text-white">Crosstraining</h1>
+        </div>
+      </div>
+
+      {/* Login Content */}
+      <div className="flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -202,6 +212,7 @@ export const Login = ({ isPendingUser, pendingEmail }: LoginProps) => {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };
