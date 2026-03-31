@@ -31,6 +31,15 @@ export const getGroups = async () => {
   return snapshot.docs.map(docToObj);
 };
 
+export const createGroup = async (group: any) => {
+  const docRef = await addDoc(collection(db, 'exercise_groups'), group);
+  return { id: docRef.id, ...group };
+};
+
+export const deleteGroup = async (id: string) => {
+  await deleteDoc(doc(db, 'exercise_groups', id));
+};
+
 // ============ EXERCISES (mostly static - read once) ============
 export const getExercises = async (groupId?: string) => {
   if (groupId) {

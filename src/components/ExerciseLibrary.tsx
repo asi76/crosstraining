@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Plus, Trash2, ArrowRightLeft, X, ArrowLeft, Edit3, RefreshCw, LogOut, Download, Upload, Image, Search } from 'lucide-react';
-import { createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings } from '../firebase';
+import { createExercise, updateExercise, deleteExercise as deleteExerciseFromDb, subscribeToGifMappings, createGroup, deleteGroup as deleteGroupFromDb } from '../firebase';
 import { getGifUrl } from '../data/gifMapping';
 import { ExerciseDetailModal } from './ExerciseDetailModal';
 import { ImportExportModal } from './ImportExportModal';
@@ -212,14 +212,20 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
 
   // Delete a group
   const deleteGroup = async (groupId: string) => {
-    // Note: Firebase doesn't have deleteGroup in the provided API
-    // First delete all exercises in the group
-    const exercisesInGroup = exercises.filter(e => e.group_id === groupId);
-    for (const ex of exercisesInGroup) {
-      await deleteExerciseFromDb(ex.id);
+    try {
+      // First delete all exercises in the group
+      const exercisesInGroup = exercises.filter(e => e.group_id === groupId);
+      for (const ex of exercisesInGroup) {
+        await deleteExerciseFromDb(ex.id);
+      }
+      // Then delete the group
+      await deleteGroupFromDb(groupId);
+      refreshGroups();
+      refreshExercises();
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      showNotification('Errore eliminazione gruppo', 'error');
     }
-    loadGroups();
-    loadExercises();
   };
 
   // Edit exercise - load GIF too
@@ -348,12 +354,23 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
   const addGroup = async () => {
     if (!newGroupName.trim()) return;
     
-    // Note: Firebase doesn't have createGroup in the provided API
-    // This would need to be added to firebase.ts
+    try {
+      const newGroup = {
+        name: newGroupName.trim().toLowerCase().replace(/\s+/g, '-'),
+        label: newGroupName.trim(),
+        color_class: newGroupColor,
+        sort_order: groups.length + 1
+      };
+      await createGroup(newGroup);
+      refreshGroups();
+    } catch (error) {
+      console.error('Error creating group:', error);
+      showNotification('Errore creazione gruppo', 'error');
+    }
+    
     setNewGroupName('');
     setNewGroupColor('blue');
     setShowAddGroup(false);
-    loadGroups();
   };
 
   // Group selector modal
