@@ -471,6 +471,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
         const cleanEx: any = {};
         // Only include defined values
         if (ex.exerciseId !== undefined) cleanEx.exerciseId = ex.exerciseId;
+        if (ex.exerciseName !== undefined) cleanEx.exerciseName = ex.exerciseName;
         if (ex.groupId !== undefined) cleanEx.groupId = ex.groupId;
         if (ex.sets !== undefined) cleanEx.sets = ex.sets;
         if (ex.reps !== undefined) cleanEx.reps = ex.reps;
