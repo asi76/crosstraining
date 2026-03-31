@@ -1016,53 +1016,51 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       {viewingExercise && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80" onClick={() => { setViewingExercise(null); setEditingExerciseInModal(false); }}>
           <div 
-            className="bg-zinc-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+            className="bg-zinc-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3">
-              <div className="flex items-center gap-3">
-                <Target className="w-5 h-5 text-blue-500" />
-                <h2 className="text-lg font-bold text-white">
+            {/* Header - compact */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 shrink-0">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-blue-500" />
+                <h2 className="text-base font-semibold text-white">
                   {editingExerciseInModal ? 'Modifica Esercizio' : viewingExercise.name}
                 </h2>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => { setViewingExercise(null); setEditingExerciseInModal(false); }}
-                  className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5 text-zinc-400" />
-                </button>
-              </div>
+              <button
+                onClick={() => { setViewingExercise(null); setEditingExerciseInModal(false); }}
+                className="p-1.5 hover:bg-zinc-800 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4 text-zinc-400" />
+              </button>
             </div>
 
-            {/* Content */}
-            <div className="flex flex-col md:flex-row max-h-[calc(80vh-70px)]">
-              {/* Left - GIF */}
-              <div className="md:w-1/2 bg-zinc-950 flex items-center justify-center p-4 min-h-[200px]">
+            {/* Content - scrollable, stacked vertically */}
+            <div className="flex-1 overflow-y-auto">
+              {/* GIF at top */}
+              <div className="bg-zinc-950 flex items-center justify-center p-4 min-h-[180px]">
                 {viewingExerciseGif ? (
                   <img 
                     src={viewingExerciseGif} 
                     alt={viewingExercise.name} 
-                    className="max-w-full max-h-full object-contain rounded-lg"
+                    className="max-w-full max-h-[200px] object-contain rounded-lg"
                   />
                 ) : (
                   <div className="text-zinc-500 text-center">
-                    <Image className="w-16 h-16 mx-auto mb-2 opacity-50" />
+                    <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
                     <p className="text-sm">Nessuna immagine</p>
                   </div>
                 )}
               </div>
 
-              {/* Right - Info or Edit Form */}
-              <div className="md:w-1/2 p-6 overflow-y-auto modal-scroll">
+              {/* Info below GIF - scrollable if needed */}
+              <div className="p-4">
                 {editingExerciseInModal ? (
-                  /* Edit Form */
-                  <div className="space-y-4">
-                    {/* Gruppo - selector in edit mode */}
+                  /* Edit Form - compact layout */
+                  <div className="space-y-3">
+                    {/* Gruppo */}
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-400 mb-2">Gruppo</h3>
+                      <h3 className="text-xs font-medium text-zinc-400 mb-1">Gruppo</h3>
                       <select
                         value={editingGroupId || viewingExercise.group_id || ''}
                         onChange={(e) => {
@@ -1076,7 +1074,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                             }
                           }
                         }}
-                        className="w-full px-3 py-2 bg-zinc-800 text-white rounded-lg focus:outline-none focus:border-blue-500"
+                        className="w-full px-3 py-2 bg-zinc-800 text-white rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                       >
                         {groups.map(g => (
                           <option key={g.id} value={g.id}>{g.label}</option>
@@ -1085,25 +1083,25 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                     </div>
                     {/* Muscoli */}
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-400 mb-2">Muscoli</h3>
-                      <div className="flex flex-wrap gap-2">
+                      <h3 className="text-xs font-medium text-zinc-400 mb-1">Muscoli</h3>
+                      <div className="flex flex-wrap gap-1">
                         {viewingExercise.muscles?.map((muscle, idx) => (
-                          <span key={idx} className="px-2 py-1 rounded text-sm bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                          <span key={idx} className="px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20">
                             {muscle}
                           </span>
                         ))}
                       </div>
                     </div>
                     {/* Tipo e Difficolta */}
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm px-3 py-1 rounded ${
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className={`px-2 py-1 rounded ${
                         viewingExercise.tipo === 'aerobico' 
                           ? 'bg-blue-500/20 text-blue-400' 
                           : 'bg-orange-500/20 text-orange-400'
                       }`}>
                         {viewingExercise.tipo === 'aerobico' ? 'Aerobico' : 'Anaerobico'}
                       </span>
-                      <span className={`text-sm px-3 py-1 rounded ${
+                      <span className={`px-2 py-1 rounded ${
                         viewingExercise.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
                         viewingExercise.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
                         'bg-red-500/20 text-red-400'
@@ -1114,29 +1112,29 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                     </div>
                     {/* Descrizione */}
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-400 mb-2">Descrizione</h3>
-                      <p className="text-zinc-300 text-base leading-relaxed">
-                        {viewingExercise.description || 'Nessuna descrizione disponibile.'}
+                      <h3 className="text-xs font-medium text-zinc-400 mb-1">Descrizione</h3>
+                      <p className="text-zinc-300 text-sm leading-relaxed">
+                        {viewingExercise.description || 'Nessuna descrizione.'}
                       </p>
                     </div>
                   </div>
                 ) : (
                   /* View Mode */
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {/* Descrizione */}
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-400 mb-2">Descrizione</h3>
-                      <p className="text-zinc-300 text-base leading-relaxed">
+                      <h3 className="text-xs font-medium text-zinc-400 mb-1">Descrizione</h3>
+                      <p className="text-zinc-300 text-sm leading-relaxed">
                         {viewingExercise.description || 'Nessuna descrizione disponibile.'}
                       </p>
                     </div>
 
                     {/* Muscoli */}
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-400 mb-2">Muscoli</h3>
-                      <div className="flex flex-wrap gap-2">
+                      <h3 className="text-xs font-medium text-zinc-400 mb-1">Muscoli</h3>
+                      <div className="flex flex-wrap gap-1">
                         {viewingExercise.muscles?.map((muscle, idx) => (
-                          <span key={idx} className="px-2 py-1 rounded text-sm bg-white/20 text-white">
+                          <span key={idx} className="px-2 py-0.5 rounded text-xs bg-white/20 text-white">
                             {muscle}
                           </span>
                         ))}
@@ -1144,15 +1142,15 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                     </div>
 
                     {/* Tipo e Difficolta */}
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm px-3 py-1 rounded ${
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className={`px-2 py-1 rounded ${
                         viewingExercise.tipo === 'aerobico' 
                           ? 'bg-blue-500/20 text-blue-400' 
                           : 'bg-orange-500/20 text-orange-400'
                       }`}>
                         {viewingExercise.tipo === 'aerobico' ? 'Aerobico' : 'Anaerobico'}
                       </span>
-                      <span className={`text-sm px-3 py-1 rounded ${
+                      <span className={`px-2 py-1 rounded ${
                         viewingExercise.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
                         viewingExercise.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
                         'bg-red-500/20 text-red-400'
@@ -1162,19 +1160,19 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                       </span>
                     </div>
 
-                    {/* Gruppo - displayed as value */}
+                    {/* Gruppo */}
                     <div>
-                      <h3 className="text-sm font-medium text-zinc-400 mb-2">Gruppo</h3>
-                      <p className="text-white font-medium">
+                      <h3 className="text-xs font-medium text-zinc-400 mb-1">Gruppo</h3>
+                      <p className="text-white text-sm font-medium">
                         {groups.find(g => g.id === (editingGroupId || viewingExercise.group_id))?.label || 'Nessun gruppo'}
                       </p>
                     </div>
 
                     {/* Modifica Button */}
-                    <div className="flex justify-end pt-3">
+                    <div className="flex justify-end pt-2">
                       <button
                         onClick={() => { setViewingExercise(null); setEditingExerciseInModal(false); setFullEditModalExercise(viewingExercise); }}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-colors"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
                       >
                         Modifica
                       </button>
