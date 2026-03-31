@@ -610,8 +610,8 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
           name: 'Forza',
           exercises: forzaExercises.map((ex, idx) => ({
             exerciseId: ex.id,
+            exerciseName: ex.name,  // Store name for display
             groupId: ex.group_id,
-            name: ex.name,
             muscles: ex.muscles,
             reps: ex.reps || 10,
             sets: 3,
@@ -625,8 +625,8 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
           name: 'Cardio 1',
           exercises: cardio1Exercises.map((ex) => ({
             exerciseId: ex.id,
+            exerciseName: ex.name,  // Store name for display
             groupId: ex.group_id,
-            name: ex.name,
             muscles: ex.muscles,
             time: 45,
             sets: 1,
@@ -640,8 +640,8 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
           name: 'Cardio 2',
           exercises: cardio2Exercises.map((ex) => ({
             exerciseId: ex.id,
+            exerciseName: ex.name,  // Store name for display
             groupId: ex.group_id,
-            name: ex.name,
             muscles: ex.muscles,
             time: 45,
             sets: 1,
