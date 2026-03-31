@@ -27,7 +27,8 @@ const docToObj = (doc: any) => ({ id: doc.id, ...doc.data() });
 
 // ============ GROUPS (mostly static - read once) ============
 export const getGroups = async () => {
-  const snapshot = await getDocs(collection(db, 'exercise_groups'));
+  const q = query(collection(db, 'exercise_groups'), orderBy('sort_order', 'asc'));
+  const snapshot = await getDocs(q);
   return snapshot.docs.map(docToObj);
 };
 

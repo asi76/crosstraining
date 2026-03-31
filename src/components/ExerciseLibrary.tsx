@@ -177,17 +177,19 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
       const newIndex = groups.findIndex(g => g.id === over.id);
       
       if (oldIndex !== -1 && newIndex !== -1) {
-        // Reorder groups locally
+        // Create new order
         const newGroups = [...groups];
         const [movedGroup] = newGroups.splice(oldIndex, 1);
         newGroups.splice(newIndex, 0, movedGroup);
         
-        // Update sort_order for all groups in Firebase
+        // Update Firebase with new sort_order values
         try {
-          await Promise.all(newGroups.map((g, index) => 
+          const updates = newGroups.map((g, index) => 
             updateGroup(g.id, { sort_order: index })
-          ));
-          refreshGroups();
+          );
+          await Promise.all(updates);
+          // After Firebase update, refresh to get ordered data
+          await refreshGroups();
         } catch (error) {
           console.error('Error reordering groups:', error);
           showNotification('Errore riordinamento gruppi', 'error');
