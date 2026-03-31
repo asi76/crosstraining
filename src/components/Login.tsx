@@ -52,10 +52,12 @@ export const Login = ({ isPendingUser, pendingEmail }: LoginProps) => {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-40 bg-zinc-900 backdrop-blur-sm rounded-b-xl border-b-2 border-black/30 -mx-4 px-4 py-4">
-        <div className="flex items-center gap-3">
-          <Dumbbell className="w-6 h-6 text-blue-400" />
-          <h1 className="text-xl font-bold text-white">Crosstraining</h1>
+      <div className="sticky top-0 z-40 bg-zinc-900 backdrop-blur-sm rounded-b-xl border-b-2 border-black/30">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center gap-3">
+            <Dumbbell className="w-6 h-6 text-blue-400" />
+            <h1 className="text-xl font-bold text-white">Crosstraining</h1>
+          </div>
         </div>
       </div>
 
