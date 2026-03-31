@@ -674,7 +674,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
   return (
     <div className="max-w-4xl mx-auto p-4">
       {/* Sticky Header - dark black */}
-      <div className="sticky top-0 z-40 bg-zinc-950 backdrop-blur-sm rounded-b-xl -mx-4 px-4 pb-2 space-y-2">
+      <div className="sticky top-0 z-40 bg-zinc-900 backdrop-blur-sm rounded-b-xl -mx-4 px-4 pb-2 space-y-2">
         {/* Title row */}
         <div className="flex items-center justify-between pt-4">
           <div className="flex items-center gap-4">
@@ -736,7 +736,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
             value={workoutName}
             onChange={(e) => setWorkoutName(e.target.value)}
             placeholder="Nome della scheda"
-            className="flex-1 px-4 py-3 bg-zinc-950 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+            className="flex-1 px-4 py-3 bg-zinc-900 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
           />
           <button
             onClick={handleSave}
@@ -853,7 +853,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
           </div>
         )}
         {isSearching && searchResults.length === 0 && searchQuery.trim() && (
-          <div className="bg-zinc-950 rounded-xl px-5 py-8 text-center text-zinc-500">
+          <div className="bg-zinc-900 rounded-xl px-5 py-8 text-center text-zinc-500">
             Nessun esercizio trovato per "{searchQuery}"
           </div>
         )}
@@ -871,7 +871,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
                 return (
                   <div
                     key={exercise.id}
-                    className="bg-zinc-950 rounded-xl px-5 py-4 hover:bg-zinc-800/30 transition-colors"
+                    className="bg-zinc-900 rounded-xl px-5 py-4 hover:bg-zinc-800/30 transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -924,7 +924,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
         {!isSearching && (
           <div className="space-y-3">
             {groups.map(group => (
-              <div key={group.id} className="bg-zinc-950 rounded-xl">
+              <div key={group.id} className="bg-zinc-900 rounded-xl">
                 {/* Group Header */}
                 <button
                   id={`workout-group-header-${group.id}`}
@@ -1016,7 +1016,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       {viewingExercise && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80" onClick={() => { setViewingExercise(null); setEditingExerciseInModal(false); }}>
           <div 
-            className="bg-zinc-950 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+            className="bg-zinc-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header - compact */}
@@ -1038,7 +1038,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
             {/* Content - scrollable, stacked vertically */}
             <div className="flex-1 overflow-y-auto">
               {/* GIF at top */}
-              <div className="bg-zinc-950 flex items-center justify-center p-4 min-h-[180px]">
+              <div className="bg-zinc-900 flex items-center justify-center p-4 min-h-[180px]">
                 {viewingExerciseGif ? (
                   <img 
                     src={viewingExerciseGif} 
@@ -1188,7 +1188,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       {moveExerciseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80" onClick={() => setMoveExerciseModal(null)}>
           <div
-            className="bg-zinc-950 rounded-2xl w-full max-w-md overflow-hidden"
+            className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4">
@@ -1269,7 +1269,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
       {duplicateError && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80" onClick={() => setDuplicateError(null)}>
           <div
-            className="bg-zinc-950 rounded-2xl w-full max-w-md overflow-hidden"
+            className="bg-zinc-900 rounded-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
