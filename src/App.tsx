@@ -220,7 +220,7 @@ function App() {
                 <Dumbbell className="w-6 h-6 text-blue-500" />
               </div>
               <div>
-                <h1 className="text-[1.375rem] font-bold text-white">Crosstraining</h1>
+                <h1 className="text-[1.4rem] font-bold text-white">Crosstraining</h1>
                 <p className="text-gray-400 text-xs">Benvenuto, {user.displayName?.split(' ')[0] || 'Atleta'}</p>
               </div>
             </div>
