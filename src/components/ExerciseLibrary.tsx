@@ -524,10 +524,11 @@ export function ExerciseLibrary({ onBack }: ExerciseLibraryProps) {
     if (!newGroupName.trim()) return;
     
     try {
+      const colorClass = groupColors.find(c => c.id === newGroupColor)?.class || groupColors[0].class;
       const newGroup = {
         name: newGroupName.trim().toLowerCase().replace(/\s+/g, '-'),
         label: newGroupName.trim(),
-        color_class: newGroupColor,
+        color_class: colorClass,
         sort_order: groups.length + 1
       };
       await createGroup(newGroup);
