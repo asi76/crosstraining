@@ -685,7 +685,7 @@ export function CreateWorkout({ onBack, onSave, editWorkout }: CreateWorkoutProp
               <ArrowLeft className="w-5 h-5 text-white" />
             </button>
             <h2 className="text-xl font-bold text-white">
-              {editWorkout ? 'Modifica Scheda' : 'Editor scheda'}
+              {editWorkout ? 'Modifica Scheda' : 'Modifica Scheda'}
             </h2>
           </div>
           <div className="flex items-center gap-2">
