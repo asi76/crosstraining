@@ -217,7 +217,7 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-zinc-700 p-2 rounded-xl">
-                <Dumbbell className="w-6 h-6 text-white" />
+                <Dumbbell className="w-6 h-6 text-blue-500" />
               </div>
               <div>
                 <h1 className="text-[1.375rem] font-bold text-white">Crosstraining</h1>
